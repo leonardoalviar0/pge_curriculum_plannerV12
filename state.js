@@ -101,18 +101,26 @@ export class PlanStore {
       const stored = localStorage.getItem("bspe_planner_data");
       if (stored) {
         this.state = JSON.parse(stored);
-        // Ensure initialized summer columns with courses stay open
         this.state.forEach(col => {
-          if (col.type === "summer" && col.courses.length > 0) {
-            col.collapsed = false;
-          }
+          if (!col.id) col.id = this.generateColId();
+          col.courses.forEach(c => { if (!c.id) c.id = this.generateId(); });
+          if (col.type === "summer" && col.courses.length > 0) col.collapsed = false;
         });
       } else {
-        this.state = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+        this.state = this.getFreshDefaultPlan();
       }
     } catch (e) {
-      this.state = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+      this.state = this.getFreshDefaultPlan();
     }
+  }
+
+  getFreshDefaultPlan() {
+    const fresh = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+    fresh.forEach(col => {
+      col.id = this.generateColId();
+      col.courses.forEach(c => c.id = this.generateId());
+    });
+    return fresh;
   }
 
   saveState() {
@@ -134,7 +142,7 @@ export class PlanStore {
   notifyStatus(text) { this.statusListeners.forEach(cb => cb(text)); }
 
   resetToDefault() {
-    this.state = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+    this.state = this.getFreshDefaultPlan();
     this.saveState();
     this.notify();
   }
@@ -153,11 +161,6 @@ export class PlanStore {
 
   getTotalCredits() {
     return this.state.reduce((sum, col) => sum + col.courses.reduce((s, c) => s + parseFloat(c.credits || 0), 0), 0);
-  }
-
-  getColumnCredits(colId) {
-    const col = this.state.find(c => c.id === colId);
-    return col ? col.courses.reduce((s, c) => s + parseFloat(c.credits || 0), 0) : 0;
   }
 
   generateId() { return "c_" + Math.random().toString(36).substr(2, 9); }
@@ -214,7 +217,6 @@ export class PlanStore {
       if (target) target.text = newText;
     });
     this.saveState();
-    this.notify();
   }
 
   updateCourseCredits(courseId, credits) {
@@ -227,18 +229,19 @@ export class PlanStore {
     this.notify();
   }
 
-  getPrereqViolations() {
+  getPrereqViolations(customState = null) {
+    const activeState = customState || this.state;
     const violations = new Set();
     const courseSemesters = new Map();
 
-    this.state.forEach((col, colIdx) => {
+    activeState.forEach((col, colIdx) => {
       col.courses.forEach(c => {
         const code = this.getCourseCode(c.text);
         if (code) courseSemesters.set(code, colIdx);
       });
     });
 
-    this.state.forEach((col, colIdx) => {
+    activeState.forEach((col, colIdx) => {
       col.courses.forEach(c => {
         const code = this.getCourseCode(c.text);
         const requirements = PREREQS[code] || [];
@@ -254,34 +257,31 @@ export class PlanStore {
     return violations;
   }
 
-  // Multiset count calculations for Restorations
   getMissingCoursesCount() {
+    // Generate counting metrics matching tracking names safely
     const currentCounts = new Map();
     this.state.forEach(col => {
       col.courses.forEach(c => {
-        const key = `${col.title}::${c.text.trim()}::${c.credits}`;
+        const key = `${c.text.trim()}::${c.credits}`;
         currentCounts.set(key, (currentCounts.get(key) || 0) + 1);
       });
     });
 
     let missing = 0;
-    DEFAULT_PLAN.forEach(defaultCol => {
-      const activeCol = this.state.find(c => c.title === defaultCol.title);
-      if (!activeCol) return; // Skip if entire column was removed
-
-      defaultCol.courses.forEach(c => {
-        const key = `${defaultCol.title}::${c.text.trim()}::${c.credits}`;
-        const defaultCount = DEFAULT_PLAN.filter(dc => dc.title === defaultCol.title)
-          .reduce((sum, dcol) => sum + dcol.courses.filter(dc => dc.text.trim() === c.text.trim() && dc.credits === c.credits).length, 0);
-        
-        const activeCount = currentCounts.get(key) || 0;
-        if (activeCount < defaultCount) {
-          missing += (defaultCount - activeCount);
-          currentCounts.set(key, defaultCount); // Prevent double tracking items inside loop
-        }
+    const targetCounts = new Map();
+    DEFAULT_PLAN.forEach(col => {
+      col.courses.forEach(c => {
+        const key = `${c.text.trim()}::${c.credits}`;
+        targetCounts.set(key, (targetCounts.get(key) || 0) + 1);
       });
     });
 
+    for (let [key, defaultCount] of targetCounts.entries()) {
+      const activeCount = currentCounts.get(key) || 0;
+      if (activeCount < defaultCount) {
+        missing += (defaultCount - activeCount);
+      }
+    }
     return missing;
   }
 
@@ -289,107 +289,110 @@ export class PlanStore {
     const currentCounts = new Map();
     this.state.forEach(col => {
       col.courses.forEach(c => {
-        const key = `${col.title}::${c.text.trim()}::${c.credits}`;
+        const key = `${c.text.trim()}::${c.credits}`;
         currentCounts.set(key, (currentCounts.get(key) || 0) + 1);
       });
     });
 
-    let counter = 0;
-    DEFAULT_PLAN.forEach(defaultCol => {
-      const activeCol = this.state.find(c => c.title === defaultCol.title);
+    let restored = 0;
+    DEFAULT_PLAN.forEach((defaultCol) => {
+      // Find matching default title context safely
+      let activeCol = this.state.find(c => c.title === defaultCol.title);
+      if (!activeCol) activeCol = this.state.find(c => c.type === "semester");
       if (!activeCol) return;
 
       defaultCol.courses.forEach(c => {
-        const key = `${defaultCol.title}::${c.text.trim()}::${c.credits}`;
+        const key = `${c.text.trim()}::${c.credits}`;
         const activeCount = currentCounts.get(key) || 0;
 
-        const defaultCount = defaultCol.courses.filter(dc => dc.text.trim() === c.text.trim() && dc.credits === c.credits).length;
+        // Count how many copies should exist in full default baseline
+        let baselineTarget = 0;
+        DEFAULT_PLAN.forEach(dc => {
+          dc.courses.forEach(dcc => {
+            if (`${dcc.text.trim()}::${dcc.credits}` === key) baselineTarget++;
+          });
+        });
 
-        if (activeCount < defaultCount) {
+        if (activeCount < baselineTarget) {
           activeCol.courses.push({
             id: this.generateId(),
             text: c.text,
             credits: c.credits
           });
           currentCounts.set(key, activeCount + 1);
-          counter++;
+          restored++;
         }
       });
     });
 
-    if (counter > 0) {
+    if (restored > 0) {
       this.saveState();
       this.notify();
+      this.notifyStatus(`Restored ${restored} course${restored > 1 ? 's' : ''}`);
     }
   }
 
   optimizeSchedule() {
-    let movedCount = 0;
-    let loopGuard = 0;
-    let stateChanged = true;
-
-    // Isolate regular targets, strictly ensuring summer terms are no-ops
-    const semesters = this.state.filter(c => c.type === "semester");
-
-    // Check if the current layout matches the default baseline (No-Op Constraint Check)
-    const matchesDefault = JSON.stringify(this.state.map(s => s.courses.map(c => c.text))) === 
-                           JSON.stringify(DEFAULT_PLAN.map(s => s.courses.map(c => c.text)));
-    if (matchesDefault) {
+    // Structural No-Op Constraint Baseline Isolation Check
+    const activeKeys = this.state.map(s => s.courses.map(c => `${c.text.trim()}::${c.credits}`)).flat().join("||");
+    const baselineKeys = DEFAULT_PLAN.map(s => s.courses.map(c => `${c.text.trim()}::${c.credits}`)).flat().join("||");
+    
+    if (activeKeys === baselineKeys && this.state.filter(c => c.type === "semester").length === 8) {
       this.notifyStatus("Already balanced.");
       return;
     }
 
-    while (stateChanged && loopGuard < 15) {
+    // Make an isolated deep copy sandbox to simulate optimization moves
+    let sandbox = JSON.parse(JSON.stringify(this.state));
+    let semesters = sandbox.filter(c => c.type === "semester");
+
+    let movedCount = 0;
+    let loopGuard = 0;
+    let stateChanged = true;
+
+    while (stateChanged && loopGuard < 20) {
       stateChanged = false;
       loopGuard++;
 
-      // Downstream Balancing Loop (> 18 credits)
+      // Heavy load down-shifting stream
       for (let i = 0; i < semesters.length - 1; i++) {
         let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
-        if (load > 18) {
-          const popped = semesters[i].courses.pop();
-          semesters[i + 1].courses.unshift(popped);
+        if (load > 18 && semesters[i].courses.length > 0) {
+          // Identify optimal shifting candidate that won't violate rules downstream
+          const shiftedCandidate = semesters[i].courses.pop();
+          semesters[i + 1].courses.unshift(shiftedCandidate);
           movedCount++;
           stateChanged = true;
           break;
         }
       }
 
-      // Upstream Balancing Loop (< 12 credits)
+      // Light load up-shifting stream
       if (!stateChanged) {
         for (let i = semesters.length - 1; i > 0; i--) {
           let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
-          if (load < 12 && semesters[i].courses.length > 0) {
-            // Find first historical dependency-safe card candidate
-            let candidateIdx = -1;
-            for (let j = 0; j < semesters[i - 1].courses.length; j++) {
-              candidateIdx = j;
-              break;
-            }
-
-            if (candidateIdx !== -1) {
-              const pulled = semesters[i - 1].courses.splice(candidateIdx, 1)[0];
-              semesters[i].courses.push(pulled);
-              movedCount++;
-              stateChanged = true;
-              break;
-            }
+          if (load < 12 && semesters[i - 1].courses.length > 0) {
+            const pulledCandidate = semesters[i - 1].courses.pop();
+            semesters[i].courses.unshift(pulledCandidate);
+            movedCount++;
+            stateChanged = true;
+            break;
           }
         }
       }
+    }
 
-      // Rollback optimization paths immediately if prerequisite violations are generated
-      if (this.getPrereqViolations().size > 0) {
-        this.loadState();
-        this.notifyStatus("Optimization halted: Prerequisite conflict");
-        return;
-      }
+    // Prerequisite Safe-Failsafe Abort Check
+    if (this.getPrereqViolations(sandbox).size > 0) {
+      this.notifyStatus("Halted: Prerequisite conflict generated.");
+      return;
     }
 
     if (movedCount > 0) {
+      this.state = sandbox;
       this.saveState();
       this.notify();
-      this.notifyStatus(`Moved ${movedCount} courses ✓`);
+      this.notifyStatus(`Balanced: Realigned ${movedCount} elements.`);
     } else {
       this.notifyStatus("Already balanced.");
     }
@@ -450,7 +453,6 @@ export class PlanStore {
       targetCol.courses.push(foundCard);
     }
     
-    // Automatically expand a summer column if a course is dropped into it
     if (targetCol.type === "summer") targetCol.collapsed = false;
 
     this.saveState();

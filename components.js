@@ -1,7 +1,6 @@
 // components.js
 
 let activeDrag = null;
-let ghostPlaceholder = null;
 
 export function renderLegend(container, store) {
   container.innerHTML = "";
@@ -35,15 +34,12 @@ export function createCourseCard(course, store, isViolated) {
   card.className = "card";
   card.dataset.id = course.id;
   
-  // Set up critical cross-browser touch overrides directly on the style layers
-  card.style.touchAction = "none";
-  
   const style = store.getSubjectConfig(course.text);
   card.style.setProperty("--subj-color", style.color);
   card.style.setProperty("background", style.bg);
 
   card.innerHTML = `
-    <div class="handle" style="touch-action: none; user-select: none;">⠿</div>
+    <div class="handle" title="Drag to move">⠿</div>
     <div class="card-mid">
       <input class="card-input-name" value="${course.text.replace(/"/g, '&quot;')}" title="Edit course description" />
       <div class="card-meta-row">
@@ -68,10 +64,8 @@ export function createCourseCard(course, store, isViolated) {
 
   card.querySelector(".btn-delete-card").addEventListener("click", () => store.deleteCourse(course.id));
 
-  // Explicitly trigger actions via primary click paths
   const handle = card.querySelector(".handle");
   handle.addEventListener("pointerdown", (e) => {
-    // Stop event bubbling to prevent selection artifacts on underlying text blocks
     e.stopPropagation();
     startDrag(e, card, store);
   });
@@ -80,102 +74,84 @@ export function createCourseCard(course, store, isViolated) {
 }
 
 function startDrag(e, cardNode, store) {
-  if (e.button !== 0) return; // Ignore right clicks or auxiliary buttons
+  if (e.button !== 0) return; 
   e.preventDefault();
   
   const rect = cardNode.getBoundingClientRect();
+  
+  // Clone visual layer to follow pointer precisely
+  const clone = cardNode.cloneNode(true);
+  clone.classList.add('dragging-clone');
+  clone.style.width = `${rect.width}px`;
+  clone.style.height = `${rect.height}px`;
+  clone.style.left = `${rect.left}px`;
+  clone.style.top = `${rect.top}px`;
+  document.body.appendChild(clone);
+
+  // Convert the actual element into a structural placeholder within the DOM
+  cardNode.classList.add('is-placeholder');
+
   activeDrag = {
     id: cardNode.dataset.id,
     node: cardNode,
+    clone: clone,
     offsetX: e.clientX - rect.left,
     offsetY: e.clientY - rect.top,
-    store: store,
-    pointerId: e.pointerId
+    store: store
   };
 
-  ghostPlaceholder = document.createElement("div");
-  ghostPlaceholder.className = "placeholder";
-  ghostPlaceholder.style.height = `${rect.height}px`;
-  cardNode.parentNode.insertBefore(ghostPlaceholder, cardNode);
-
-  // Lock target layouts dimensions prior to popping standard positioning out-of-bounds
-  cardNode.style.width = `${rect.width}px`;
-  cardNode.style.height = `${rect.height}px`;
-  cardNode.style.left = `${rect.left}px`;
-  cardNode.style.top = `${rect.top}px`;
-  cardNode.classList.add("dragging");
-  
-  // Direct Pointer Tracking Binding Pass
-  cardNode.setPointerCapture(e.pointerId);
-  cardNode.addEventListener("pointermove", onDrag);
-  cardNode.addEventListener("pointerup", stopDrag);
-  cardNode.addEventListener("pointercancel", stopDrag); // Safe-failsafe wrapper path for OS gestures
+  // Bind to document to track fast off-element movements
+  document.addEventListener("pointermove", onDrag, { passive: false });
+  document.addEventListener("pointerup", stopDrag);
+  document.addEventListener("pointercancel", stopDrag);
 }
 
 function onDrag(e) {
   if (!activeDrag) return;
-  const node = activeDrag.node;
+  e.preventDefault(); 
   
-  // Reposition elements along exact viewport relative locations
-  node.style.left = `${e.clientX - activeDrag.offsetX}px`;
-  node.style.top = `${e.clientY - activeDrag.offsetY}px`;
+  const { clone, node, offsetX, offsetY } = activeDrag;
 
+  clone.style.left = `${e.clientX - offsetX}px`;
+  clone.style.top = `${e.clientY - offsetY}px`;
+
+  // Utilize actual DOM manipulation for the placeholder to trigger CSS reflows inherently
   const target = findDropTarget(e.clientX, e.clientY);
-  if (target && ghostPlaceholder) {
-    if (target.beforeNode) {
-      target.columnBody.insertBefore(ghostPlaceholder, target.beforeNode);
-    } else {
-      target.columnBody.appendChild(ghostPlaceholder);
+  if (target) {
+    if (target.beforeNode && target.beforeNode !== node) {
+       target.columnBody.insertBefore(node, target.beforeNode);
+    } else if (!target.beforeNode) {
+       target.columnBody.appendChild(node);
     }
-    ghostPlaceholder.style.display = "block";
-  } else if (ghostPlaceholder) {
-    ghostPlaceholder.style.display = "none";
   }
 }
 
 function stopDrag(e) {
   if (!activeDrag) return;
-  const { node, id, store, pointerId } = activeDrag;
+  const { clone, node, id, store } = activeDrag;
   
-  node.removeEventListener("pointermove", onDrag);
-  node.removeEventListener("pointerup", stopDrag);
-  node.removeEventListener("pointercancel", stopDrag);
-  
-  try { node.releasePointerCapture(pointerId); } catch (err) {}
+  document.removeEventListener("pointermove", onDrag);
+  document.removeEventListener("pointerup", stopDrag);
+  document.removeEventListener("pointercancel", stopDrag);
 
-  const target = findDropTarget(e.clientX, e.clientY);
-  if (target) {
-    const beforeId = target.beforeNode ? target.beforeNode.dataset.id : null;
-    store.reorderCard(id, target.columnId, beforeId);
+  clone.remove();
+  node.classList.remove('is-placeholder');
+
+  // Read the structural destination directly from the completed DOM shuffle
+  const colBody = node.closest('.col-body');
+  if (colBody) {
+     const colId = colBody.closest('.column').id;
+     const nextNode = node.nextElementSibling;
+     const beforeId = nextNode && nextNode.classList.contains('card') ? nextNode.dataset.id : null;
+     store.reorderCard(id, colId, beforeId);
   } else {
-    store.notify(); // Triggers atomic structural layout reset to original positions
+     store.notify(); // Rebound fallback
   }
 
-  if (ghostPlaceholder && ghostPlaceholder.parentNode) {
-    ghostPlaceholder.parentNode.removeChild(ghostPlaceholder);
-  }
-
-  node.classList.remove("dragging");
-  node.style.width = "";
-  node.style.height = "";
-  node.style.left = "";
-  node.style.top = "";
-  
   activeDrag = null;
-  ghostPlaceholder = null;
 }
 
 function findDropTarget(x, y) {
-  const boardNode = document.getElementById("board");
-  if (!boardNode) return null;
-
-  const boardRect = boardNode.getBoundingClientRect();
-  const paddingBuffer = 100; // Expanded vertical catchment threshold zone
-
-  if (y < boardRect.top - paddingBuffer || y > boardRect.bottom + paddingBuffer) {
-    return null; 
-  }
-
   const columns = document.querySelectorAll(".column");
   let closestColumn = null;
   let minDistance = Infinity;
@@ -183,6 +159,10 @@ function findDropTarget(x, y) {
   for (let col of columns) {
     if (col.classList.contains("collapsed")) continue;
     const rect = col.getBoundingClientRect();
+    
+    // Y-Axis Constraint to prevent header/footer phantom drops
+    if (y < rect.top - 60 || y > rect.bottom + 60) continue;
+
     if (x >= rect.left && x <= rect.right) {
       closestColumn = col;
       break;
@@ -197,7 +177,7 @@ function findDropTarget(x, y) {
   if (!closestColumn) return null;
 
   const body = closestColumn.querySelector(".col-body");
-  const cards = body.querySelectorAll(".card:not(.dragging)");
+  const cards = body.querySelectorAll(".card:not(.is-placeholder)");
   let beforeNode = null;
 
   for (let card of cards) {

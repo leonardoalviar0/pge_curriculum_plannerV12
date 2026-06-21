@@ -35,12 +35,15 @@ export function createCourseCard(course, store, isViolated) {
   card.className = "card";
   card.dataset.id = course.id;
   
+  // Set up critical cross-browser touch overrides directly on the style layers
+  card.style.touchAction = "none";
+  
   const style = store.getSubjectConfig(course.text);
   card.style.setProperty("--subj-color", style.color);
   card.style.setProperty("background", style.bg);
 
   card.innerHTML = `
-    <div class="handle">⠿</div>
+    <div class="handle" style="touch-action: none; user-select: none;">⠿</div>
     <div class="card-mid">
       <input class="card-input-name" value="${course.text.replace(/"/g, '&quot;')}" title="Edit course description" />
       <div class="card-meta-row">
@@ -65,14 +68,19 @@ export function createCourseCard(course, store, isViolated) {
 
   card.querySelector(".btn-delete-card").addEventListener("click", () => store.deleteCourse(course.id));
 
+  // Explicitly trigger actions via primary click paths
   const handle = card.querySelector(".handle");
-  handle.addEventListener("pointerdown", (e) => startDrag(e, card, store));
+  handle.addEventListener("pointerdown", (e) => {
+    // Stop event bubbling to prevent selection artifacts on underlying text blocks
+    e.stopPropagation();
+    startDrag(e, card, store);
+  });
 
   return card;
 }
 
 function startDrag(e, cardNode, store) {
-  if (e.button !== 0) return; 
+  if (e.button !== 0) return; // Ignore right clicks or auxiliary buttons
   e.preventDefault();
   
   const rect = cardNode.getBoundingClientRect();
@@ -81,26 +89,34 @@ function startDrag(e, cardNode, store) {
     node: cardNode,
     offsetX: e.clientX - rect.left,
     offsetY: e.clientY - rect.top,
-    store: store
+    store: store,
+    pointerId: e.pointerId
   };
 
   ghostPlaceholder = document.createElement("div");
   ghostPlaceholder.className = "placeholder";
+  ghostPlaceholder.style.height = `${rect.height}px`;
   cardNode.parentNode.insertBefore(ghostPlaceholder, cardNode);
 
+  // Lock target layouts dimensions prior to popping standard positioning out-of-bounds
   cardNode.style.width = `${rect.width}px`;
+  cardNode.style.height = `${rect.height}px`;
   cardNode.style.left = `${rect.left}px`;
   cardNode.style.top = `${rect.top}px`;
   cardNode.classList.add("dragging");
   
+  // Direct Pointer Tracking Binding Pass
   cardNode.setPointerCapture(e.pointerId);
   cardNode.addEventListener("pointermove", onDrag);
   cardNode.addEventListener("pointerup", stopDrag);
+  cardNode.addEventListener("pointercancel", stopDrag); // Safe-failsafe wrapper path for OS gestures
 }
 
 function onDrag(e) {
   if (!activeDrag) return;
   const node = activeDrag.node;
+  
+  // Reposition elements along exact viewport relative locations
   node.style.left = `${e.clientX - activeDrag.offsetX}px`;
   node.style.top = `${e.clientY - activeDrag.offsetY}px`;
 
@@ -113,25 +129,26 @@ function onDrag(e) {
     }
     ghostPlaceholder.style.display = "block";
   } else if (ghostPlaceholder) {
-    // Hide visual placement cues if dragging outside the structural bounds matrix
     ghostPlaceholder.style.display = "none";
   }
 }
 
 function stopDrag(e) {
   if (!activeDrag) return;
-  const { node, id, store } = activeDrag;
+  const { node, id, store, pointerId } = activeDrag;
   
   node.removeEventListener("pointermove", onDrag);
   node.removeEventListener("pointerup", stopDrag);
-  try { node.releasePointerCapture(e.pointerId); } catch (err) {}
+  node.removeEventListener("pointercancel", stopDrag);
+  
+  try { node.releasePointerCapture(pointerId); } catch (err) {}
 
   const target = findDropTarget(e.clientX, e.clientY);
   if (target) {
     const beforeId = target.beforeNode ? target.beforeNode.dataset.id : null;
     store.reorderCard(id, target.columnId, beforeId);
   } else {
-    store.notify(); 
+    store.notify(); // Triggers atomic structural layout reset to original positions
   }
 
   if (ghostPlaceholder && ghostPlaceholder.parentNode) {
@@ -139,17 +156,21 @@ function stopDrag(e) {
   }
 
   node.classList.remove("dragging");
+  node.style.width = "";
+  node.style.height = "";
+  node.style.left = "";
+  node.style.top = "";
+  
   activeDrag = null;
   ghostPlaceholder = null;
 }
 
 function findDropTarget(x, y) {
-  // #2 Fix: Enforce true 2D cross-axis boundary restrictions on interactive tracking surfaces
   const boardNode = document.getElementById("board");
   if (!boardNode) return null;
 
   const boardRect = boardNode.getBoundingClientRect();
-  const paddingBuffer = 40; // Clamps drop operations cleanly within the layout lanes
+  const paddingBuffer = 100; // Expanded vertical catchment threshold zone
 
   if (y < boardRect.top - paddingBuffer || y > boardRect.bottom + paddingBuffer) {
     return null; 

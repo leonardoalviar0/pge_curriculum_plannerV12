@@ -104,7 +104,6 @@ export class PlanStore {
         this.state.forEach(col => {
           if (!col.id) col.id = this.generateColId();
           col.courses.forEach(c => { if (!c.id) c.id = this.generateId(); });
-          if (col.type === "summer" && col.courses.length > 0) col.collapsed = false;
         });
       } else {
         this.state = this.getFreshDefaultPlan();
@@ -190,7 +189,7 @@ export class PlanStore {
       id: this.generateColId(),
       title: label,
       type: type,
-      collapsed: false,
+      collapsed: type === "summer", // #5 Fix: Custom added summers start collapsed by default matching standard flow rules
       courses: []
     });
     this.saveState();
@@ -217,6 +216,7 @@ export class PlanStore {
       if (target) target.text = newText;
     });
     this.saveState();
+    this.notify(); // #1 Fix: Dispatches rendering notify updates instantly to recalculate badges, colors, and warnings
   }
 
   updateCourseCredits(courseId, credits) {
@@ -258,68 +258,51 @@ export class PlanStore {
   }
 
   getMissingCoursesCount() {
-    // Generate counting metrics matching tracking names safely
-    const currentCounts = new Map();
-    this.state.forEach(col => {
-      col.courses.forEach(c => {
-        const key = `${c.text.trim()}::${c.credits}`;
-        currentCounts.set(key, (currentCounts.get(key) || 0) + 1);
+    let missingCount = 0;
+
+    DEFAULT_PLAN.forEach(defaultCol => {
+      // #3 Fix: Locate matching terms by title string comparison specifically
+      const activeCol = this.state.find(c => c.title === defaultCol.title);
+      
+      defaultCol.courses.forEach(defCourse => {
+        const defKey = `${defCourse.text.trim()}::${defCourse.credits}`;
+        
+        // Count total matched occurrences remaining specifically inside this exact corresponding column path
+        const expectedCount = defaultCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
+        const actualCount = activeCol ? activeCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length : 0;
+        
+        // If the item was moved to a different semester or deleted altogether, track it correctly here
+        if (actualCount < expectedCount) {
+          // Guard multi-instance metrics to prevent overcounting iterations
+          const alreadyTracked = defaultCol.courses.slice(0, defaultCol.courses.indexOf(defCourse)).filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
+          if (alreadyTracked < expectedCount - actualCount) {
+            missingCount++;
+          }
+        }
       });
     });
 
-    let missing = 0;
-    const targetCounts = new Map();
-    DEFAULT_PLAN.forEach(col => {
-      col.courses.forEach(c => {
-        const key = `${c.text.trim()}::${c.credits}`;
-        targetCounts.set(key, (targetCounts.get(key) || 0) + 1);
-      });
-    });
-
-    for (let [key, defaultCount] of targetCounts.entries()) {
-      const activeCount = currentCounts.get(key) || 0;
-      if (activeCount < defaultCount) {
-        missing += (defaultCount - activeCount);
-      }
-    }
-    return missing;
+    return missingCount;
   }
 
   restoreMissingCourses() {
-    const currentCounts = new Map();
-    this.state.forEach(col => {
-      col.courses.forEach(c => {
-        const key = `${c.text.trim()}::${c.credits}`;
-        currentCounts.set(key, (currentCounts.get(key) || 0) + 1);
-      });
-    });
-
     let restored = 0;
-    DEFAULT_PLAN.forEach((defaultCol) => {
-      // Find matching default title context safely
-      let activeCol = this.state.find(c => c.title === defaultCol.title);
-      if (!activeCol) activeCol = this.state.find(c => c.type === "semester");
-      if (!activeCol) return;
 
-      defaultCol.courses.forEach(c => {
-        const key = `${c.text.trim()}::${c.credits}`;
-        const activeCount = currentCounts.get(key) || 0;
+    DEFAULT_PLAN.forEach(defaultCol => {
+      const activeCol = this.state.find(c => c.title === defaultCol.title);
+      if (!activeCol) return; // #3 Fix: Skip missing course injections instead of blindly dumping into arbitrary columns if columns were renamed
 
-        // Count how many copies should exist in full default baseline
-        let baselineTarget = 0;
-        DEFAULT_PLAN.forEach(dc => {
-          dc.courses.forEach(dcc => {
-            if (`${dcc.text.trim()}::${dcc.credits}` === key) baselineTarget++;
-          });
-        });
+      defaultCol.courses.forEach(defCourse => {
+        const defKey = `${defCourse.text.trim()}::${defCourse.credits}`;
+        const expectedCount = defaultCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
+        const actualCount = activeCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
 
-        if (activeCount < baselineTarget) {
+        if (actualCount < expectedCount) {
           activeCol.courses.push({
             id: this.generateId(),
-            text: c.text,
-            credits: c.credits
+            text: defCourse.text,
+            credits: defCourse.credits
           });
-          currentCounts.set(key, activeCount + 1);
           restored++;
         }
       });
@@ -329,11 +312,12 @@ export class PlanStore {
       this.saveState();
       this.notify();
       this.notifyStatus(`Restored ${restored} course${restored > 1 ? 's' : ''}`);
+    } else {
+      this.notifyStatus("All default courses present in assigned semesters.");
     }
   }
 
   optimizeSchedule() {
-    // Structural No-Op Constraint Baseline Isolation Check
     const activeKeys = this.state.map(s => s.courses.map(c => `${c.text.trim()}::${c.credits}`)).flat().join("||");
     const baselineKeys = DEFAULT_PLAN.map(s => s.courses.map(c => `${c.text.trim()}::${c.credits}`)).flat().join("||");
     
@@ -342,7 +326,6 @@ export class PlanStore {
       return;
     }
 
-    // Make an isolated deep copy sandbox to simulate optimization moves
     let sandbox = JSON.parse(JSON.stringify(this.state));
     let semesters = sandbox.filter(c => c.type === "semester");
 
@@ -354,11 +337,9 @@ export class PlanStore {
       stateChanged = false;
       loopGuard++;
 
-      // Heavy load down-shifting stream
       for (let i = 0; i < semesters.length - 1; i++) {
         let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
         if (load > 18 && semesters[i].courses.length > 0) {
-          // Identify optimal shifting candidate that won't violate rules downstream
           const shiftedCandidate = semesters[i].courses.pop();
           semesters[i + 1].courses.unshift(shiftedCandidate);
           movedCount++;
@@ -367,7 +348,6 @@ export class PlanStore {
         }
       }
 
-      // Light load up-shifting stream
       if (!stateChanged) {
         for (let i = semesters.length - 1; i > 0; i--) {
           let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
@@ -382,7 +362,6 @@ export class PlanStore {
       }
     }
 
-    // Prerequisite Safe-Failsafe Abort Check
     if (this.getPrereqViolations(sandbox).size > 0) {
       this.notifyStatus("Halted: Prerequisite conflict generated.");
       return;

@@ -189,7 +189,7 @@ export class PlanStore {
       id: this.generateColId(),
       title: label,
       type: type,
-      collapsed: type === "summer", // #5 Fix: Custom added summers start collapsed by default matching standard flow rules
+      collapsed: type === "summer", 
       courses: []
     });
     this.saveState();
@@ -216,7 +216,7 @@ export class PlanStore {
       if (target) target.text = newText;
     });
     this.saveState();
-    this.notify(); // #1 Fix: Dispatches rendering notify updates instantly to recalculate badges, colors, and warnings
+    this.notify(); 
   }
 
   updateCourseCredits(courseId, credits) {
@@ -259,21 +259,14 @@ export class PlanStore {
 
   getMissingCoursesCount() {
     let missingCount = 0;
-
     DEFAULT_PLAN.forEach(defaultCol => {
-      // #3 Fix: Locate matching terms by title string comparison specifically
       const activeCol = this.state.find(c => c.title === defaultCol.title);
-      
       defaultCol.courses.forEach(defCourse => {
         const defKey = `${defCourse.text.trim()}::${defCourse.credits}`;
-        
-        // Count total matched occurrences remaining specifically inside this exact corresponding column path
         const expectedCount = defaultCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
         const actualCount = activeCol ? activeCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length : 0;
         
-        // If the item was moved to a different semester or deleted altogether, track it correctly here
         if (actualCount < expectedCount) {
-          // Guard multi-instance metrics to prevent overcounting iterations
           const alreadyTracked = defaultCol.courses.slice(0, defaultCol.courses.indexOf(defCourse)).filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
           if (alreadyTracked < expectedCount - actualCount) {
             missingCount++;
@@ -281,16 +274,14 @@ export class PlanStore {
         }
       });
     });
-
     return missingCount;
   }
 
   restoreMissingCourses() {
     let restored = 0;
-
     DEFAULT_PLAN.forEach(defaultCol => {
       const activeCol = this.state.find(c => c.title === defaultCol.title);
-      if (!activeCol) return; // #3 Fix: Skip missing course injections instead of blindly dumping into arbitrary columns if columns were renamed
+      if (!activeCol) return; 
 
       defaultCol.courses.forEach(defCourse => {
         const defKey = `${defCourse.text.trim()}::${defCourse.credits}`;
@@ -298,11 +289,7 @@ export class PlanStore {
         const actualCount = activeCol.courses.filter(c => `${c.text.trim()}::${c.credits}` === defKey).length;
 
         if (actualCount < expectedCount) {
-          activeCol.courses.push({
-            id: this.generateId(),
-            text: defCourse.text,
-            credits: defCourse.credits
-          });
+          activeCol.courses.push({ id: this.generateId(), text: defCourse.text, credits: defCourse.credits });
           restored++;
         }
       });
@@ -383,9 +370,7 @@ export class PlanStore {
       if (col.type === "summer" && col.courses.length === 0) return;
       const hours = col.courses.reduce((s, c) => s + c.credits, 0);
       output += `${col.title} (${hours} Credits)\n`;
-      col.courses.forEach(c => {
-        output += `  - ${c.text} (${c.credits} cr)\n`;
-      });
+      col.courses.forEach(c => { output += `  - ${c.text} (${c.credits} cr)\n`; });
       output += "\n";
     });
     output += `GRAND TOTAL PLANNED: ${this.getTotalCredits()} HRS\n`;
@@ -417,6 +402,8 @@ export class PlanStore {
 
   reorderCard(courseId, targetColId, beforeCourseId) {
     let foundCard = null;
+    
+    // Extract Moved Card
     this.state.forEach(col => {
       const idx = col.courses.findIndex(c => c.id === courseId);
       if (idx !== -1) foundCard = col.courses.splice(idx, 1)[0];
@@ -424,15 +411,46 @@ export class PlanStore {
 
     if (!foundCard) return;
 
+    // Inject primary card into target
     const targetCol = this.state.find(c => c.id === targetColId);
+    let primaryInsertIdx = targetCol.courses.length;
+
     if (beforeCourseId) {
-      const insertIdx = targetCol.courses.findIndex(c => c.id === beforeCourseId);
-      targetCol.courses.splice(insertIdx, 0, foundCard);
+      primaryInsertIdx = targetCol.courses.findIndex(c => c.id === beforeCourseId);
+      if(primaryInsertIdx === -1) primaryInsertIdx = targetCol.courses.length;
+      targetCol.courses.splice(primaryInsertIdx, 0, foundCard);
     } else {
       targetCol.courses.push(foundCard);
     }
     
     if (targetCol.type === "summer") targetCol.collapsed = false;
+
+    // CO-REQUISITE PHYSICS MAPPING
+    const code = this.getCourseCode(foundCard.text);
+    const coReqPairs = {
+       "PHY 303K": "PHY 105M",
+       "PHY 105M": "PHY 303K",
+       "PHY 303L": "PHY 105N",
+       "PHY 105N": "PHY 303L"
+    };
+
+    if (coReqPairs[code]) {
+       const pairCode = coReqPairs[code];
+       let pairCard = null;
+       
+       // Search board for the corresponding partner
+       this.state.forEach(col => {
+          const pIdx = col.courses.findIndex(c => this.getCourseCode(c.text) === pairCode);
+          if (pIdx !== -1) pairCard = col.courses.splice(pIdx, 1)[0];
+       });
+
+       // Magnetically attach it directly beneath the primary course
+       if (pairCard) {
+          const freshTargetCol = this.state.find(c => c.id === targetColId);
+          const freshPrimaryIdx = freshTargetCol.courses.findIndex(c => c.id === courseId);
+          freshTargetCol.courses.splice(freshPrimaryIdx + 1, 0, pairCard);
+       }
+    }
 
     this.saveState();
     this.notify();

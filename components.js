@@ -6,7 +6,6 @@ let ghostPlaceholder = null;
 export function renderLegend(container, store) {
   container.innerHTML = "";
   
-  // Isolate dynamically active subject tracks from central state engine map
   const activeSubjects = new Set();
   store.state.forEach(col => {
     col.courses.forEach(c => {
@@ -15,7 +14,6 @@ export function renderLegend(container, store) {
     });
   });
 
-  // Fallback defaults if layout cards are empty
   if (activeSubjects.size === 0) {
     activeSubjects.add("Petroleum (PGE)::#BF5700");
     activeSubjects.add("Math (M)::#2E5C8A");
@@ -58,7 +56,6 @@ export function createCourseCard(course, store, isViolated) {
     </div>
   `;
 
-  // Attach Inline Configuration Listeners
   const nameInput = card.querySelector(".card-input-name");
   nameInput.addEventListener("change", (e) => store.updateCourseText(course.id, e.target.value));
   nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") nameInput.blur(); });
@@ -68,7 +65,6 @@ export function createCourseCard(course, store, isViolated) {
 
   card.querySelector(".btn-delete-card").addEventListener("click", () => store.deleteCourse(course.id));
 
-  // Pointer Events Interface Setup
   const handle = card.querySelector(".handle");
   handle.addEventListener("pointerdown", (e) => startDrag(e, card, store));
 
@@ -76,7 +72,7 @@ export function createCourseCard(course, store, isViolated) {
 }
 
 function startDrag(e, cardNode, store) {
-  if (e.button !== 0) return; // Prevent drag actions unless primary click is fired
+  if (e.button !== 0) return; 
   e.preventDefault();
   
   const rect = cardNode.getBoundingClientRect();
@@ -115,6 +111,10 @@ function onDrag(e) {
     } else {
       target.columnBody.appendChild(ghostPlaceholder);
     }
+    ghostPlaceholder.style.display = "block";
+  } else if (ghostPlaceholder) {
+    // Hide visual placement cues if dragging outside the structural bounds matrix
+    ghostPlaceholder.style.display = "none";
   }
 }
 
@@ -131,7 +131,7 @@ function stopDrag(e) {
     const beforeId = target.beforeNode ? target.beforeNode.dataset.id : null;
     store.reorderCard(id, target.columnId, beforeId);
   } else {
-    store.notify(); // Snap back card node if dropped out of bounds
+    store.notify(); 
   }
 
   if (ghostPlaceholder && ghostPlaceholder.parentNode) {
@@ -144,6 +144,17 @@ function stopDrag(e) {
 }
 
 function findDropTarget(x, y) {
+  // #2 Fix: Enforce true 2D cross-axis boundary restrictions on interactive tracking surfaces
+  const boardNode = document.getElementById("board");
+  if (!boardNode) return null;
+
+  const boardRect = boardNode.getBoundingClientRect();
+  const paddingBuffer = 40; // Clamps drop operations cleanly within the layout lanes
+
+  if (y < boardRect.top - paddingBuffer || y > boardRect.bottom + paddingBuffer) {
+    return null; 
+  }
+
   const columns = document.querySelectorAll(".column");
   let closestColumn = null;
   let minDistance = Infinity;
@@ -231,7 +242,6 @@ export function createColumn(colData, store, violations) {
     </div>
   `;
 
-  // Attach Summer Toggling
   if (colData.type === "summer") {
     col.querySelector(".summer-toggle").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -242,7 +252,6 @@ export function createColumn(colData, store, violations) {
     });
   }
 
-  // Double Click Confirmation Action Track
   let removeClicks = 0;
   let confirmTimer = null;
   const deleteBtn = col.querySelector(".col-delete");
@@ -279,7 +288,6 @@ export function renderBoard(container, store) {
     container.appendChild(createColumn(colData, store, violations));
   });
 
-  // Render Sidebar Expansion Controllers
   const buttonWrapper = document.createElement("div");
   buttonWrapper.className = "add-column-buttons";
   buttonWrapper.innerHTML = `

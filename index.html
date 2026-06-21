@@ -14,6 +14,7 @@
       --orange: #BF5700;
       --orange-deep: #8C3F00;
       --orange-tint: #FBE2C7;
+      --slate: #5C6670;
       --amber: #C9821B;
       --green: #3F7D52;
       --red: #B5402E;
@@ -87,6 +88,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      user-select: none;
     }
     .btn:hover { background: #FAF6EE; }
     .btn-restore { background: var(--white); border-color: var(--amber); color: var(--amber); display: none; }
@@ -166,7 +168,7 @@
       padding: 0.25rem;
     }
 
-    /* Column Styles */
+    /* Column Layouts */
     .column {
       width: 290px;
       background: var(--white);
@@ -179,16 +181,18 @@
       flex-shrink: 0;
     }
     .column.summer {
-      width: 200px;
+      width: 290px;
       border-top-color: var(--amber);
     }
+    
+    /* Collapsed State Matrix Rules */
     .column.summer.collapsed {
-      width: 46px;
+      width: 48px !important;
       background: #EFEAE0;
       border: 1px solid var(--border);
       border-top: 5px solid var(--border);
       cursor: pointer;
-      height: 450px;
+      height: 480px;
       position: relative;
     }
     .column.summer.collapsed .collapsed-title {
@@ -204,9 +208,11 @@
       transform: translate(-50%, 0) rotate(180deg);
       white-space: nowrap;
       opacity: 0.7;
+      display: block;
     }
     .column.summer.collapsed * { display: none; }
     .column.summer.collapsed .collapsed-title { display: block; }
+    .collapsed-title { display: none; }
 
     .col-header {
       padding: 1rem;
@@ -243,10 +249,8 @@
       text-decoration: underline;
     }
     
-    /* Gauge styles */
-    .gauge-container {
-      width: 100%;
-    }
+    /* Gauges */
+    .gauge-container { width: 100%; }
     .gauge-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -261,11 +265,7 @@
       overflow: hidden;
       width: 100%;
     }
-    .gauge-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 3px;
-    }
+    .gauge-fill { height: 100%; width: 0%; border-radius: 3px; }
     .gauge-fill.light { background: var(--amber); }
     .gauge-fill.track { background: var(--green); }
     .gauge-fill.heavy { background: var(--red); }
@@ -276,7 +276,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
-      min-height: 200px;
+      min-height: 250px;
       background: #FCFAF7;
     }
     .col-footer {
@@ -295,6 +295,7 @@
       font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
+      color: var(--slate);
     }
     .btn-add-course:hover { background: var(--white); border-color: var(--orange); color: var(--orange); }
 
@@ -306,7 +307,7 @@
       margin-left: 0.5rem;
     }
 
-    /* Course Card Styles */
+    /* Interactive Context Layout Modules */
     .card {
       background: var(--white);
       border: 1px solid var(--border);
@@ -322,6 +323,8 @@
       user-select: none;
     }
     .card:hover { box-shadow: var(--hover-shadow); }
+    
+    /* Drag and Drop Layer Definitions */
     .card.dragging {
       position: fixed;
       z-index: 9999;
@@ -343,6 +346,7 @@
       font-size: 1rem;
       line-height: 1.2;
       padding-top: 0.1rem;
+      padding-right: 0.25rem;
     }
     .card-mid {
       display: flex;
@@ -371,7 +375,7 @@
       align-items: center;
       font-size: 0.75rem;
       font-weight: 500;
-      color: #666;
+      color: var(--slate);
     }
     .credit-input {
       width: 32px;
@@ -435,7 +439,7 @@
       text-align: center;
     }
 
-    /* Print View Overrides */
+    /* Print Overrides */
     @media print {
       body { background: var(--white) !important; color: #000000 !important; padding: 0 !important; font-size: 11pt; }
       header, .instructions, .legend, .actions-bar, footer, .add-column-buttons, .col-footer, .btn-delete-card, .handle, .col-delete, .summer-toggle { display: none !important; }
@@ -452,7 +456,7 @@
       .credit-input::-webkit-outer-spin-button, .credit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     }
 
-    /* Responsive Viewports */
+    /* Mobile Context Responsiveness */
     @media (max-width: 640px) {
       body { padding: 1rem; }
       .column { width: 80vw; scroll-snap-align: center; }
@@ -528,17 +532,37 @@
       const el = document.getElementById('statusMsg');
       el.textContent = text;
       el.classList.add('show');
-      if (text === 'Saved' || text.includes('balanced') || text.includes('Moved')) {
-        setTimeout(() => el.classList.remove('show'), 2000);
+      if (text === 'Saved' || text.includes('balanced') || text.includes('Moved') || text.includes('Halted')) {
+        setTimeout(() => el.classList.remove('show'), 2500);
       }
     });
 
-    // Wire Core Operational Actions
+    // Wire Core Functional Layer Nodes
     document.getElementById('optimizeBtn').addEventListener('click', () => window.store.optimizeSchedule());
+    document.getElementById('restoreBtn').addEventListener('click', () => window.store.restoreMissingCourses());
     document.getElementById('copyBtn').addEventListener('click', () => window.store.copyAsText(document.getElementById('copyBtn')));
     document.getElementById('printBtn').addEventListener('click', () => window.print());
     
     let resetTimer = null;
     const resetBtn = document.getElementById('resetBtn');
     resetBtn.addEventListener('click', () => {
-      if
+      if (resetBtn.classList.contains('confirming')) {
+        clearTimeout(resetTimer);
+        resetBtn.classList.remove('confirming');
+        resetBtn.textContent = 'Reset to default plan';
+        window.store.resetToDefault();
+      } else {
+        resetBtn.classList.add('confirming');
+        resetBtn.textContent = 'Click again to confirm';
+        resetTimer = setTimeout(() => {
+          resetBtn.classList.remove('confirming');
+          resetBtn.textContent = 'Reset to default plan';
+        }, 2500);
+      }
+    });
+
+    // Fire Initial State Paint Pass
+    refreshUI();
+  </script>
+</body>
+</html>

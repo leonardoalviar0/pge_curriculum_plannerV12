@@ -1,211 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Petroleum Engineering Plan of Study</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --cream: #F6F1E7;
-      --charcoal: #262220;
-      --orange: #BF5700;
-      --orange-deep: #8C3F00;
-      --orange-tint: #FBE2C7;
-      --slate: #5C6670;
-      --amber: #C9821B;
-      --green: #3F7D52;
-      --red: #B5402E;
-      --white: #FFFFFF;
-      --border: #E3D6BF;
-      --card-shadow: 0 2px 4px rgba(38, 34, 32, 0.06);
-      --hover-shadow: 0 4px 12px rgba(38, 34, 32, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGE Plan of Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E7;
+    --charcoal:#262220;
+    --orange:#BF5700;
+    --orange-deep:#8C3F00;
+    --orange-tint:#FBE2C7;
+    --slate:#5C6670;
+    --white:#FFFFFF;
+    --border:#E3D6BF;
+    --green:#3F7D52;
+    --amber:#C9821B;
+    --red:#B5402E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--charcoal);
+    font-family:'Space Grotesk', sans-serif;
+    padding:2rem;
+    min-height:100vh;
+  }
+  header{
+    max-width:1400px;
+    margin:0 auto 2rem auto;
+  }
+  .eyebrow{
+    font-size:0.75rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    opacity:0.7;
+    margin-bottom:0.5rem;
+  }
+  .header-main{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:1.5rem;
+    margin-bottom:1rem;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:2.5rem;
+    margin:0;
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--orange);
+    font-weight:500;
+  }
+  .actions{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:0.85rem;
+    font-weight:600;
+    padding:0.6rem 1rem;
+    border-radius:6px;
+    border:1.5px solid var(--border);
+    background:var(--white);
+    color:var(--charcoal);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:0.5rem;
+    user-select:none;
+  }
+  .btn:hover{ background:#FAF6EE; }
+  .btn-optimize{ border-color:var(--green); color:var(--green); }
+  .btn-optimize:hover{ background:#EEF7F2; }
+  .btn-restore{ border-color:var(--amber); color:var(--amber); display:none; }
+  .btn-restore:hover{ background:#FFF9EE; }
+  .btn-outline{ border-color:var(--orange); color:var(--orange-deep); }
+  .btn-outline:hover{ background:var(--orange-tint); }
+  .btn-reset{ border-color:var(--charcoal); }
+  .btn-reset.confirming{ background:var(--red); border-color:var(--red); color:var(--white); }
+  
+  .status-msg{
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--green);
+    margin-left:0.5rem;
+    transition:opacity 0.2s ease;
+  }
+  .instructions{
+    max-width:800px;
+    font-size:0.95rem;
+    line-height:1.5;
+    margin:0 0 1.5rem 0;
+    opacity:0.8;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    background:var(--white);
+    padding:0.75rem 1.25rem;
+    border-radius:8px;
+    border:1px solid var(--border);
+    margin-bottom:1.5rem;
+  }
+  .legend-item{ display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; font-weight:600; }
+  .legend-dot{ width:10px; height:10px; border-radius:50%; }
+  
+  .stats{ display:flex; gap:1.5rem; margin-bottom:2rem; flex-wrap:wrap; }
+  .stat-card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:0.75rem 1.25rem;
+    min-width:160px;
+  }
+  .stat-label{ font-size:0.7rem; font-weight:700; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px; }
+  .stat-val{ font-size:1.6rem; font-weight:700; margin-top:0.2rem; }
+  
+  .board-outer{ width:100%; overflow-x:auto; padding-bottom:1rem; }
+  .board{ display:flex; gap:1.2rem; align-items:flex-start; padding:0.2rem; width:max-content; }
+  
+  .column{
+    width:280px;
+    background:var(--white);
+    border:1px solid var(--border);
+    border-top:5px solid var(--orange);
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 2px 4px rgba(38,34,32,0.04);
+  }
+  .column-summer{ border-top-color:var(--amber); }
+  .column.collapsed{
+    width:50px;
+    height:450px;
+    background:#EFEAE0;
+    border-top-color:var(--border);
+    cursor:pointer;
+    position:relative;
+  }
+  .column.collapsed .collapsed-title{
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    transform:rotate(180deg);
+    font-family:'Fraunces', serif;
+    font-size:0.95rem;
+    font-weight:600;
+    position:absolute;
+    top:1.5rem;
+    left:50%;
+    transform:translate(-50%, 0) rotate(180deg);
+    white-space:nowrap;
+    opacity:0.7;
+  }
+  .column.collapsed * { display:none; }
+  .column.collapsed .collapsed-title { display:block; }
+  .collapsed-title { display:none; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  .col-header{ padding:1rem; border-bottom:1px solid var(--border); background:#FAF8F5; border-radius:11px 11px 0 0; }
+  .col-title-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
+  .col-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; }
+  .col-delete{ background:none; border:none; color:var(--red); font-size:0.75rem; cursor:pointer; font-weight:600; }
+  .summer-toggle{ font-size:0.75rem; color:var(--slate); background:none; border:none; cursor:pointer; text-decoration:underline; }
+  
+  .gauge-wrap{ width:100%; margin-top:0.3rem; }
+  .gauge-text{ font-size:0.72rem; font-weight:600; margin-bottom:0.2rem; display:flex; justify-content:space-between; }
+  .gauge-bg{ height:6px; background:#EFEFEF; border-radius:3px; overflow:hidden; }
+  .gauge-fill{ height:100%; width:0; border-radius:3px; }
+  .gauge-fill.light{ background:var(--amber); }
+  .gauge-fill.track{ background:var(--green); }
+  .gauge-fill.heavy{ background:var(--red); }
+  .summer-hrs{ font-size:0.75rem; font-weight:600; opacity:0.7; }
 
-    body {
-      background: var(--cream);
-      color: var(--charcoal);
-      font-family: 'Space Grotesk', sans-serif;
-      padding: 2rem;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  .col-body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem; min-height:200px; background:#FCFAF7; }
+  .col-body.drag-over { background:#F3EDE2; border-radius:0 0 8px 8px; }
+  
+  .col-footer{ padding:0.6rem 0.75rem; border-top:1px dashed var(--border); background:#FAF8F5; border-radius:0 0 11px 11px; }
+  .btn-add-course{ width:100%; background:none; border:1px dashed var(--border); padding:0.4rem; font-size:0.78rem; font-weight:600; border-radius:6px; cursor:pointer; color:var(--slate); }
+  .btn-add-course:hover{ background:var(--white); border-color:var(--orange); color:var(--orange); }
 
-    header {
-      max-width: 1600px;
-      margin: 0 auto 2rem;
-    }
-    .eyebrow {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--charcoal);
-      opacity: 0.7;
-      margin-bottom: 0.25rem;
-    }
-    .title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 2.5rem; line-height: 1.1; }
-    h1 em { font-style: italic; color: var(--orange); font-weight: 400; }
+  .add-col-controls{ display:flex; flex-direction:column; gap:0.6rem; align-self:flex-start; }
 
-    .actions-bar { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-    .btn { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; background: var(--white); border: 1.5px solid var(--border); color: var(--charcoal); display: inline-flex; align-items: center; gap: 0.5rem; user-select: none; }
-    .btn:hover { background: #FAF6EE; }
-    .btn-restore { background: var(--white); border-color: var(--amber); color: var(--amber); display: none; }
-    .btn-restore:hover { background: #FFF9EE; }
-    .btn-optimize { background: var(--white); border-color: var(--green); color: var(--green); }
-    .btn-optimize:hover { background: #EEF7F2; }
-    .btn-outline { border-color: var(--orange); color: var(--orange-deep); }
-    .btn-outline:hover { background: var(--orange-tint); }
-    .btn-reset { border-color: var(--charcoal); }
-    .btn-reset.confirming { background: var(--red); border-color: var(--red); color: var(--white); }
-    .btn-reset.confirming:hover { background: #9E2D1C; }
+  .card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-left:5px solid #6B7280;
+    border-radius:8px;
+    padding:0.65rem;
+    box-shadow:0 1px 3px rgba(38,34,32,0.05);
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:0.4rem;
+    align-items:start;
+    cursor:grab;
+    user-select:none;
+    transition:transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .card:active { cursor:grabbing; }
+  .card.dragging { opacity:0.4; transform:scale(0.98); }
+  
+  .card-handle{ color:#A0A0A0; font-size:1.1rem; padding-right:0.1rem; line-height:1; pointer-events:none; }
+  .card-mid{ display:flex; flex-direction:column; gap:0.3rem; }
+  .card-text{ font-size:0.82rem; font-weight:600; border:none; background:transparent; color:var(--charcoal); width:100%; outline:none; }
+  .card-text:focus{ background:#FAF6EE; box-shadow:0 0 0 2px var(--orange-tint); border-radius:3px; }
+  
+  .card-meta{ display:flex; align-items:center; gap:0.5rem; }
+  .card-cr-wrap{ display:flex; align-items:center; font-size:0.72rem; font-weight:500; color:var(--slate); }
+  .card-credits{ width:28px; border:1px solid var(--border); border-radius:4px; padding:0.1rem; text-align:center; font-family:inherit; font-size:0.72rem; font-weight:600; margin-right:0.15rem; }
+  .badge{ font-size:0.62rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:4px; color:var(--white); }
 
-    .status-text { font-size: 0.85rem; font-weight: 500; color: var(--green); opacity: 0; transition: opacity 0.3s ease; }
-    .status-text.show { opacity: 1; }
+  .card-right{ display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; height:100%; min-height:42px; }
+  .btn-del-card{ background:none; border:none; color:#A0A0A0; cursor:pointer; font-size:1rem; line-height:1; padding:0; }
+  .btn-del-card:hover{ color:var(--red); }
+  .warn-icon{ width:16px; height:16px; background:var(--red); color:var(--white); font-weight:700; font-size:0.65rem; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:help; }
 
-    .instructions { max-width: 900px; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; opacity: 0.85; }
+  footer{ max-width:1400px; margin:3rem auto 0 auto; padding-top:1.2rem; border-top:1px solid var(--border); font-size:0.78rem; opacity:0.6; text-align:center; line-height:1.4; }
 
-    .legend { display: flex; flex-wrap: wrap; gap: 1rem; background: var(--white); padding: 0.75rem 1.25rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 500; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    .stats-bar { display: flex; gap: 2rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; }
-    .stat-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; letter-spacing: 0.5px; }
-    .stat-val { font-size: 1.75rem; font-weight: 700; margin-top: 0.15rem; }
-    #totalHours { color: var(--charcoal); }
-
-    .board-wrapper { width: 100%; overflow-x: auto; padding-bottom: 1rem; }
-    .board { display: flex; gap: 1.25rem; align-items: flex-start; min-width: max-content; padding: 0.25rem; touch-action: pan-x; }
-
-    .column { width: 290px; background: var(--white); border: 1px solid var(--border); border-top: 5px solid var(--orange); border-radius: 12px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; flex-shrink: 0; }
-    .column.summer { width: 290px; border-top-color: var(--amber); }
-    
-    .column.summer.collapsed { width: 48px !important; background: #EFEAE0; border: 1px solid var(--border); border-top: 5px solid var(--border); cursor: pointer; height: 480px; position: relative; }
-    .column.summer.collapsed .collapsed-title { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); font-family: 'Fraunces', serif; font-size: 0.95rem; font-weight: 600; position: absolute; top: 1.5rem; left: 50%; transform: translate(-50%, 0) rotate(180deg); white-space: nowrap; opacity: 0.7; display: block; }
-    .column.summer.collapsed * { display: none; }
-    .column.summer.collapsed .collapsed-title { display: block; }
-    .collapsed-title { display: none; }
-
-    .col-header { padding: 1rem; border-bottom: 1px solid var(--border); background: #FAF8F5; border-top-left-radius: 6px; border-top-right-radius: 6px; }
-    .col-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-    .col-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.15rem; }
-    .col-delete { background: none; border: none; color: var(--red); font-size: 0.8rem; cursor: pointer; font-weight: 600; }
-    .summer-toggle { font-size: 0.75rem; color: var(--slate); background: none; border: none; cursor: pointer; text-decoration: underline; }
-    
-    .gauge-container { width: 100%; }
-    .gauge-label { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem; display: flex; justify-content: space-between; }
-    .gauge-bar { height: 6px; background: #EFEFEF; border-radius: 3px; overflow: hidden; width: 100%; }
-    .gauge-fill { height: 100%; width: 0%; border-radius: 3px; }
-    .gauge-fill.light { background: var(--amber); }
-    .gauge-fill.track { background: var(--green); }
-    .gauge-fill.heavy { background: var(--red); }
-    .summer-hours { font-size: 0.75rem; font-weight: 600; color: var(--charcoal); opacity: 0.7; }
-
-    .col-body { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.65rem; min-height: 250px; background: #FCFAF7; }
-    .col-footer { padding: 0.75rem; border-top: 1px dashed var(--border); background: #FAF8F5; border-bottom-left-radius: 11px; border-bottom-right-radius: 11px; }
-    .btn-add-course { width: 100%; background: none; border: 1px dashed var(--border); padding: 0.5rem; font-size: 0.8rem; font-weight: 600; border-radius: 6px; cursor: pointer; color: var(--slate); }
-    .btn-add-course:hover { background: var(--white); border-color: var(--orange); color: var(--orange); }
-
-    .add-column-buttons { display: flex; flex-direction: column; gap: 0.75rem; align-self: flex-start; margin-left: 0.5rem; }
-
-    .card { background: var(--white); border: 1px solid var(--border); border-left: 5px solid #6B7280; border-radius: 8px; padding: 0.75rem; position: relative; box-shadow: var(--card-shadow); display: grid; grid-template-columns: auto 1fr auto; gap: 0.5rem; align-items: start; user-select: none; }
-    .card:hover { box-shadow: var(--hover-shadow); }
-    
-    /* Advanced Drag Visual Rules */
-    .card.is-placeholder { opacity: 0.3; border: 2px dashed var(--orange); background: rgba(227, 214, 191, 0.2); }
-    .card.is-placeholder * { opacity: 0; pointer-events: none; }
-    .dragging-clone { position: fixed; z-index: 9999; pointer-events: none; box-shadow: 0 12px 24px rgba(0,0,0,0.15); opacity: 0.95; cursor: grabbing !important; }
-
-    .handle { cursor: grab; color: #A0A0A0; font-size: 1.1rem; line-height: 1.1; padding-top: 0.1rem; padding-right: 0.25rem; touch-action: none; }
-    .handle:active { cursor: grabbing; }
-    .card-mid { display: flex; flex-direction: column; gap: 0.4rem; }
-    .card-input-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600; border: none; background: transparent; color: var(--charcoal); width: 100%; resize: none; }
-    .card-input-name:focus { outline: none; background: #FAF6EE; box-shadow: 0 0 0 2px var(--orange-tint); border-radius: 3px; }
-    
-    .card-meta-row { display: flex; align-items: center; gap: 0.5rem; }
-    .credit-input-wrapper { display: flex; align-items: center; font-size: 0.75rem; font-weight: 500; color: var(--slate); }
-    .credit-input { width: 32px; border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem; text-align: center; font-family: inherit; font-size: 0.75rem; font-weight: 600; margin-right: 0.25rem; }
-    .badge { font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.4rem; border-radius: 4px; letter-spacing: 0.3px; }
-
-    .card-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; height: 100%; min-height: 48px; }
-    .btn-delete-card { background: none; border: none; color: #A0A0A0; cursor: pointer; font-size: 1.1rem; line-height: 1; }
-    .btn-delete-card:hover { color: var(--red); }
-    .warning-badge { width: 18px; height: 18px; background: var(--red); color: var(--white); font-weight: 700; font-size: 0.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: help; }
-
-    footer { max-width: 1600px; margin: 3rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.8rem; line-height: 1.4; opacity: 0.6; text-align: center; }
-
-    @media print {
-      body { background: var(--white) !important; color: #000000 !important; padding: 0 !important; font-size: 11pt; }
-      header, .instructions, .legend, .actions-bar, footer, .add-column-buttons, .col-footer, .btn-delete-card, .handle, .col-delete, .summer-toggle { display: none !important; }
-      .board-wrapper { overflow: visible !important; }
-      .board { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 4mm !important; min-width: 100% !important; }
-      .column { width: 100% !important; page-break-inside: avoid; border: 1px solid #000 !important; border-top: 4px solid var(--orange) !important; box-shadow: none !important; }
-      .column.summer.collapsed { display: flex !important; width: 100% !important; height: auto !important; background: var(--white) !important; border-top: 4px solid var(--amber) !important; }
-      .column.summer.collapsed * { display: flex !important; }
-      .column.summer.collapsed .collapsed-title { display: none !important; }
-      .col-body { background: var(--white) !important; min-height: auto !important; }
-      .card { page-break-inside: avoid; border: 1px solid #CCC !important; border-left: 4px solid var(--subj-color, #6B7280) !important; box-shadow: none !important; grid-template-columns: 1fr auto !important; }
-      .handle { display: none !important; }
-      .credit-input { border: none !important; background: transparent !important; pointer-events: none !important; -moz-appearance: textfield; }
-      .credit-input::-webkit-outer-spin-button, .credit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    }
-
-    @media (max-width: 640px) { body { padding: 1rem; } .column { width: 80vw; scroll-snap-align: center; } .board-wrapper { scroll-snap-type: x mandatory; } }
-  </style>
+  @media print{
+    body{ background:var(--white); color:#000; padding:0; }
+    header, .instructions, .legend, .actions, footer, .add-col-controls, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle{ display:none !important; }
+    .board{ display:grid; grid-template-columns:repeat(4, 1fr); gap:4mm; width:100%; }
+    .column{ width:100% !important; page-break-inside:avoid; border:1px solid #000; box-shadow:none; }
+    .column.collapsed{ display:flex !important; height:auto; background:var(--white); }
+    .column.collapsed * { display:flex !important; }
+    .column.collapsed .collapsed-title { display:none !important; }
+    .col-body{ background:var(--white); min-height:auto; }
+    .card{ page-break-inside:avoid; border:1px solid #CCC; box-shadow:none; grid-template-columns:1fr auto; cursor:default; }
+    .card-credits{ border:none; background:transparent; }
+  }
+  @media(max-width:640px){ .column{ width:80vw; } .board-outer{ scroll-snap-type:x mandatory; } .column{ scroll-snap-align:center; } }
+</style>
 </head>
 <body>
 
   <header>
     <div class="eyebrow">Cockrell School of Engineering · UT Austin</div>
-    <div class="title-row">
+    <div class="header-main">
       <h1>Petroleum Engineering <em>Plan of Study</em></h1>
-      <div class="actions-bar">
+      <div class="actions">
         <button class="btn btn-restore" id="restoreBtn">Restore missing courses</button>
         <button class="btn btn-optimize" id="optimizeBtn">Optimize schedule</button>
         <button class="btn btn-outline" id="copyBtn">Copy as text</button>
         <button class="btn btn-outline" id="printBtn">Print plan</button>
         <button class="btn btn-reset" id="resetBtn">Reset to default plan</button>
-        <span class="status-text" id="statusMsg">Saving…</span>
+        <span class="status-msg" id="saveStatus"></span>
       </div>
     </div>
     
     <p class="instructions">
-      Drag and drop course cards by their handles (⠿) to reorganize your curriculum sequence. Corequisite physics labs map automatically. Clicking text allows inline modifications, and adjustments save dynamically to your browser session.
+      Drag and drop course cards to any semester or summer column. Physics classes and their matching labs move together as locked co-requisites. Double-click on any course title or credit hours block to customize your requirements.
     </p>
 
     <div class="legend" id="legend"></div>
 
-    <div class="stats-bar">
+    <div class="stats">
       <div class="stat-card">
         <div class="stat-label">Total Credit Hours</div>
-        <div class="stat-val" id="totalHours">0</div>
+        <div class="stat-val" id="statTotalHours">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Target BSPE Completion</div>
-        <div class="stat-val">128 <span style="font-size: 1rem; font-weight:500; opacity:0.6;">Hrs</span></div>
+        <div class="stat-label">Degree Plan Target</div>
+        <div class="stat-val">128 <span style="font-size:0.9rem; font-weight:500; opacity:0.6;">hrs</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Plan Variance</div>
-        <div class="stat-val" id="varianceHours">On Track</div>
+        <div class="stat-label">Degree Plan Variance</div>
+        <div class="stat-val" id="statVariance">On Track</div>
       </div>
     </div>
   </header>
 
-  <div class="board-wrapper">
+  <div class="board-outer">
     <div class="board" id="board"></div>
   </div>
 
@@ -213,77 +290,670 @@
     This application serves strictly as an interactive prototyping tool. It does not constitute an official degree audit system. Always verify final graduation tracks, prerequisite dependencies, and registration constraints directly with your Cockrell School academic advisor.
   </footer>
 
-  <script type="module">
-    import { PlanStore } from './state.js';
-    import { renderBoard, renderLegend } from './components.js';
+<script>
+const PREREQS = {
+  "M 408D": ["M 408C"],
+  "M 427J": ["M 408D"],
+  "PHY 303L": ["PHY 303K"],
+  "CH 302": ["CH 301"],
+  "E M 319": ["E M 306"],
+  "PGE 323L": ["PGE 323K"],
+  "HIS 315L": ["HIS 315K"]
+};
 
-    window.store = new PlanStore();
+const CO_REQS = {
+  "PHY 303K": "PHY 105M",
+  "PHY 105M": "PHY 303K",
+  "PHY 303L": "PHY 105N",
+  "PHY 105N": "PHY 303L"
+};
 
-    const refreshUI = () => {
-      renderBoard(document.getElementById('board'), window.store);
-      renderLegend(document.getElementById('legend'), window.store);
-      
-      const total = window.store.getTotalCredits();
-      document.getElementById('totalHours').textContent = total;
-      
-      // Dynamic Variance Tracker
-      const varianceNode = document.getElementById('varianceHours');
-      const variance = total - 128;
-      if (variance > 0) {
-         varianceNode.textContent = `+${variance} Over`;
-         varianceNode.style.color = 'var(--red)';
-      } else if (variance < 0) {
-         varianceNode.textContent = `${Math.abs(variance)} Under`;
-         varianceNode.style.color = 'var(--amber)';
-      } else {
-         varianceNode.textContent = `On Track`;
-         varianceNode.style.color = 'var(--green)';
+const SUBJECT_MAP = [
+  { test: /^PGE\b/i, abbrev: "PGE", label: "Petroleum (PGE)", color: "#BF5700", bg: "#FFF2E6" },
+  { test: /^M\s?\d/i, abbrev: "MATH", label: "Math (M)", color: "#2E5C8A", bg: "#EEF4FA" },
+  { test: /^PHY\b/i, abbrev: "PHYS", label: "Physics (PHY)", color: "#6B4E96", bg: "#F4F0FA" },
+  { test: /^CH\s?\d/i, abbrev: "CHEM", label: "Chemistry (CH)", color: "#1F7A6B", bg: "#EEFAF7" },
+  { test: /^E\s?M\b/i, abbrev: "E M", label: "Engr Mechanics", color: "#45607A", bg: "#F0F4F7" },
+  { test: /^GEO\b/i, abbrev: "GEO", label: "Geosciences (GEO)", color: "#8B5E34", bg: "#FAF3EC" },
+  { test: /^RHE\b/i, abbrev: "COMM", label: "Writing / Comm", color: "#8E3B46", bg: "#FCEFEF" },
+  { test: /^Tech Area Elective/i, abbrev: "ELEC", label: "Tech Elective", color: "#6F5B96", bg: "#F5F0FB" },
+  { test: /^(HIS|GOV|UGS|E\s?\d|Visual|Soc)/i, abbrev: "CORE", label: "Core Curriculum", color: "#8A7A3D", bg: "#FAF7EE" },
+  { test: /.*/, abbrev: "—", label: "Other / Unsorted", color: "#6B7280", bg: "#F3F4F6" }
+];
+
+const defaultData = [
+  { title: "Summer · Before Year 1", type: "summer", collapsed: true, courses: [] },
+  { title: "Fall · Year 1", type: "semester", courses: [
+    { text: "GEO 303 — Introduction to Geology", credits: 3 },
+    { text: "CH 301 — Principles of Chemistry I", credits: 3 },
+    { text: "M 408C — Differential & Integral Calculus", credits: 4 },
+    { text: "RHE 306 — Rhetoric and Writing", credits: 3 },
+    { text: "UGS 302 — First-Year Signature Course", credits: 3 }
+  ]},
+  { title: "Spring · Year 1", type: "semester", courses: [
+    { text: "PHY 303K — Engineering Physics I", credits: 3 },
+    { text: "PHY 105M — Laboratory For Physics I", credits: 1 },
+    { text: "M 408D — Sequences, Series, and Multivariable", credits: 4 },
+    { text: "PGE 301 — Introduction to Petroleum Engineering", credits: 3 },
+    { text: "CH 302 — Principles of Chemistry II", credits: 3 },
+    { text: "Social & Behavioral Sciences", credits: 3 }
+  ]},
+  { title: "Summer · Year 1", type: "summer", collapsed: true, courses: [] },
+  { title: "Fall · Year 2", type: "semester", courses: [
+    { text: "PHY 303L — Engineering Physics II", credits: 3 },
+    { text: "PHY 105N — Laboratory For Physics II", credits: 1 },
+    { text: "E M 306 — Statics", credits: 3 },
+    { text: "M 427J — Differential Equations with Linear Algebra", credits: 4 },
+    { text: "PGE 311 — Numerical Methods and Data Visualization", credits: 3 },
+    { text: "PGE 326 — Thermodynamics & Phase Behavior", credits: 3 }
+  ]},
+  { title: "Spring · Year 2", type: "semester", courses: [
+    { text: "GEO 316P — Sedimentary Rocks", credits: 3 },
+    { text: "E M 319 — Mechanics of Solids", credits: 3 },
+    { text: "PGE 333T — Engineering Communication", credits: 3 },
+    { text: "PGE 427 — Properties of Petroleum Fluids", credits: 4 },
+    { text: "Visual & Performing Arts", credits: 3 }
+  ]},
+  { title: "Summer · Year 2", type: "summer", collapsed: true, courses: [] },
+  { title: "Fall · Year 3", type: "semester", courses: [
+    { text: "PGE 323K — Reservoir Engineering I: Primary Recovery", credits: 3 },
+    { text: "PGE 424 — Drilling and Well Completions", credits: 4 },
+    { text: "PGE 430 — Well Logging and Transport Phenomena", credits: 4 },
+    { text: "PGE 322K — Transport Phenomena in PGE", credits: 3 },
+    { text: "GOV 310L — American Government", credits: 3 }
+  ]},
+  { title: "Spring · Year 3", type: "semester", courses: [
+    { text: "PGE 323L — Reservoir Engineering II: Secondary Recovery", credits: 3 },
+    { text: "PGE 358 — Principles of Well Logging", credits: 3 },
+    { text: "PGE 362 — Production Engineering & Well Performance", credits: 3 },
+    { text: "PGE 338 — Integrated Carbon Geostorage Engineering", credits: 3 },
+    { text: "HIS 315K — United States History I", credits: 3 }
+  ]},
+  { title: "Summer · Year 3", type: "summer", collapsed: true, courses: [] },
+  { title: "Fall · Year 4", type: "semester", courses: [
+    { text: "PGE 334 — Reservoir Engineering III", credits: 3 },
+    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
+    { text: "Tech Area Elective", credits: 3 },
+    { text: "Tech Area Elective", credits: 3 },
+    { text: "GOV 312L — Issues & Policies in American Government", credits: 3 }
+  ]},
+  { title: "Spring · Year 4", type: "semester", courses: [
+    { text: "PGE 373L — Senior Capstone Design Project", credits: 3 },
+    { text: "Tech Area Elective", credits: 3 },
+    { text: "Tech Area Elective", credits: 3 },
+    { text: "E 316 — Masterworks of Literature", credits: 3 },
+    { text: "HIS 315L — United States History II", credits: 3 }
+  ]}
+];
+
+const STORAGE_KEY = "bspe_planner_v11_board";
+const board = document.getElementById("board");
+const legend = document.getElementById("legend");
+const saveStatus = document.getElementById("saveStatus");
+let saveTimer, saveFadeTimer;
+let draggedCard = null;
+
+function getCourseCode(text) {
+  if (!text) return "";
+  const match = text.trim().match(/^([A-Z. ]+\s?\d+[A-Z]*)/i);
+  return match ? match[1].trim().toUpperCase() : "";
+}
+
+function getSubjectConfig(text) {
+  const code = getCourseCode(text);
+  return SUBJECT_MAP.find(s => s.test.test(code || text)) || SUBJECT_MAP[SUBJECT_MAP.length - 1];
+}
+
+function buildLegend() {
+  legend.innerHTML = "";
+  SUBJECT_MAP.slice(0, -1).forEach(sub => {
+    const item = document.createElement("div");
+    item.className = "legend-item";
+    item.innerHTML = `<span class="legend-dot" style="background:${sub.color}"></span><span>${sub.label}</span>`;
+    legend.appendChild(item);
+  });
+}
+
+function updateGlobalStats() {
+  let totalHours = 0;
+  board.querySelectorAll(".card").forEach(card => {
+    totalHours += parseFloat(card.querySelector(".card-credits").value) || 0;
+  });
+  
+  document.getElementById("statTotalHours").textContent = totalHours;
+  
+  // Section for total hours under/over degree plan target (128 hours)
+  const varianceNode = document.getElementById("statVariance");
+  const variance = totalHours - 128;
+  if (variance > 0) {
+    varianceNode.textContent = `+${variance} Over`;
+    varianceNode.style.color = "var(--red)";
+  } else if (variance < 0) {
+    varianceNode.textContent = `${variance} Under`;
+    varianceNode.style.color = "var(--amber)";
+  } else {
+    varianceNode.textContent = "On Track";
+    varianceNode.style.color = "var(--green)";
+  }
+  
+  // Check for missing items from baseline data to control restore visibility
+  checkMissingCourses();
+}
+
+function checkPrereqs() {
+  const colNodes = [...board.querySelectorAll(".column")];
+  const coursePositions = new Map();
+
+  colNodes.forEach((col, idx) => {
+    col.querySelectorAll(".card").forEach(card => {
+      const code = getCourseCode(card.querySelector(".card-text").value);
+      if (code) coursePositions.set(code, idx);
+    });
+  });
+
+  colNodes.forEach((col, idx) => {
+    col.querySelectorAll(".card").forEach(card => {
+      const code = getCourseCode(card.querySelector(".card-text").value);
+      const reqs = PREREQS[code] || [];
+      let violated = false;
+
+      for (const req of reqs) {
+        if (coursePositions.has(req) && coursePositions.get(req) >= idx) {
+          violated = true;
+          break;
+        }
       }
-      
-      const missingCount = window.store.getMissingCoursesCount();
-      const restoreBtn = document.getElementById('restoreBtn');
-      if (missingCount > 0) {
-        restoreBtn.textContent = `Restore ${missingCount} missing course${missingCount > 1 ? 's' : ''}`;
-        restoreBtn.style.display = 'inline-flex';
-      } else {
-        restoreBtn.style.display = 'none';
-      }
-    };
 
-    window.store.subscribe(refreshUI);
-    window.store.subscribeStatus((text) => {
-      const el = document.getElementById('statusMsg');
-      el.textContent = text;
-      el.classList.add('show');
-      if (text === 'Saved' || text.includes('balanced') || text.includes('Moved') || text.includes('Halted') || text.includes('Restored')) {
-        setTimeout(() => el.classList.remove('show'), 2500);
+      let warn = card.querySelector(".warn-icon");
+      if (violated) {
+        if (!warn) {
+          warn = document.createElement("div");
+          warn.className = "warn-icon";
+          warn.textContent = "!";
+          warn.title = "Prerequisite violation: scheduled before or concurrent with requirement.";
+          card.querySelector(".card-right").appendChild(warn);
+        }
+      } else if (warn) {
+        warn.remove();
       }
     });
+  });
+}
 
-    document.getElementById('optimizeBtn').addEventListener('click', () => window.store.optimizeSchedule());
-    document.getElementById('restoreBtn').addEventListener('click', () => window.store.restoreMissingCourses());
-    document.getElementById('copyBtn').addEventListener('click', () => window.store.copyAsText(document.getElementById('copyBtn')));
-    document.getElementById('printBtn').addEventListener('click', () => window.print());
+function updateColumnGauges() {
+  board.querySelectorAll(".column").forEach(col => {
+    if (col.classList.contains("collapsed")) return;
     
-    let resetTimer = null;
-    const resetBtn = document.getElementById('resetBtn');
-    resetBtn.addEventListener('click', () => {
-      if (resetBtn.classList.contains('confirming')) {
-        clearTimeout(resetTimer);
-        resetBtn.classList.remove('confirming');
-        resetBtn.textContent = 'Reset to default plan';
-        window.store.resetToDefault();
-      } else {
-        resetBtn.classList.add('confirming');
-        resetBtn.textContent = 'Click again to confirm';
-        resetTimer = setTimeout(() => {
-          resetBtn.classList.remove('confirming');
-          resetBtn.textContent = 'Reset to default plan';
-        }, 2500);
+    let sum = 0;
+    col.querySelectorAll(".card-credits").forEach(input => sum += parseFloat(input.value) || 0);
+    
+    const fill = col.querySelector(".gauge-fill");
+    if (fill) {
+      const text = col.querySelector(".gauge-hrs-text");
+      text.textContent = `${sum} hrs`;
+      
+      let mode = "track";
+      if (sum < 12) mode = "light";
+      else if (sum > 18) mode = "heavy";
+      
+      fill.className = `gauge-fill ${mode}`;
+      fill.style.width = `${Math.min(100, (sum / 22) * 100)}%`;
+      
+      const label = col.querySelector(".gauge-load-label");
+      if (label) label.textContent = sum < 12 ? "light load" : sum > 18 ? "heavy load" : "on track";
+    } else {
+      const label = col.querySelector(".summer-hrs");
+      if (label) label.textContent = `${sum} hrs`;
+    }
+  });
+}
+
+function createCard(text, credits) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.draggable = true;
+
+  const conf = getSubjectConfig(text);
+  card.style.setProperty("--subj-color", conf.color);
+  card.style.background = conf.bg;
+
+  card.innerHTML = `
+    <div class="card-handle">⠿</div>
+    <div class="card-mid">
+      <input type="text" class="card-text" value="${text.replace(/"/g, '&quot;')}" />
+      <div class="card-meta">
+        <div class="card-cr-wrap">
+          <input type="number" class="card-credits" value="${credits}" min="0" max="10" step="0.5" /> cr
+        </div>
+        <span class="badge" style="background:${conf.color}">${conf.abbrev}</span>
+      </div>
+    </div>
+    <div class="card-right">
+      <button class="btn-del-card" title="Delete Course">×</button>
+    </div>
+  `;
+
+  // Standard HTML5 Drag API Event Handlers (No coordinate calculation = Zero Freezes)
+  card.addEventListener("dragstart", (e) => {
+    draggedCard = card;
+    card.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+  });
+
+  card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+    draggedCard = null;
+    board.querySelectorAll(".col-body").forEach(b => b.classList.remove("drag-over"));
+    runCalculations();
+    scheduleSave();
+  });
+
+  const txtInput = card.querySelector(".card-text");
+  txtInput.addEventListener("change", () => {
+    const c = getSubjectConfig(txtInput.value);
+    card.style.setProperty("--subj-color", c.color);
+    card.style.background = c.bg;
+    card.querySelector(".badge").style.background = c.color;
+    card.querySelector(".badge").textContent = c.abbrev;
+    runCalculations();
+    scheduleSave();
+  });
+  txtInput.addEventListener("keydown", (e) => { if(e.key === "Enter") txtInput.blur(); });
+
+  card.querySelector(".card-credits").addEventListener("change", () => {
+    runCalculations();
+    scheduleSave();
+  });
+
+  card.querySelector(".btn-del-card").addEventListener("click", () => {
+    card.remove();
+    runCalculations();
+    scheduleSave();
+  });
+
+  return card;
+}
+
+function createColumnHtml(title, type, collapsed = false) {
+  const col = document.createElement("div");
+  col.className = `column ${type === "summer" ? "column-summer" : ""}`;
+  if (collapsed) col.classList.add("collapsed");
+
+  col.innerHTML = `
+    <div class="collapsed-title">${title}</div>
+    <div class="col-header">
+      <div class="col-title-row">
+        <div class="col-title">${title}</div>
+        <button class="col-delete">Remove</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; min-height:24px;">
+        ${type === 'semester' ? `
+          <div class="gauge-wrap">
+            <div class="gauge-text">
+              <span class="gauge-hrs-text">0 hrs</span>
+              <span class="gauge-load-label">on track</span>
+            </div>
+            <div class="gauge-bg"><div class="gauge-fill track"></div></div>
+          </div>
+        ` : `
+          <div class="summer-hrs">0 hrs</div>
+          <button class="summer-toggle">Collapse ⌃</button>
+        `}
+      </div>
+    </div>
+    <div class="col-body"></div>
+    <div class="col-footer">
+      <button class="btn-add-course">+ Add course</button>
+    </div>
+  `;
+
+  const body = col.querySelector(".col-body");
+
+  // Drag over target setups
+  body.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    body.classList.add("drag-over");
+    const afterElement = getDragAfterElement(body, e.clientY);
+    if (afterElement == null) {
+      body.appendChild(draggedCard);
+    } else {
+      body.insertBefore(draggedCard, afterElement);
+    }
+  });
+
+  body.addEventListener("dragleave", () => body.classList.remove("drag-over"));
+
+  body.addEventListener("drop", (e) => {
+    e.preventDefault();
+    body.classList.remove("drag-over");
+    
+    // Physics and Lab Corequisite automation matching sequence
+    if (draggedCard) {
+      const code = getCourseCode(draggedCard.querySelector(".card-text").value);
+      const targetPartnerCode = CO_REQS[code];
+      if (targetPartnerCode) {
+        // Look through the board to locate the matching pair element
+        let partnerCard = null;
+        board.querySelectorAll(".card").forEach(c => {
+          if (getCourseCode(c.querySelector(".card-text").value) === targetPartnerCode && c !== draggedCard) {
+            partnerCard = c;
+          }
+        });
+        if (partnerCard) {
+          // Magnetically route and place the lab directly after the course element
+          if (draggedCard.nextSibling) {
+            body.insertBefore(partnerCard, draggedCard.nextSibling);
+          } else {
+            body.appendChild(partnerCard);
+          }
+        }
+      }
+    }
+  });
+
+  if (type === "summer") {
+    col.querySelector(".summer-toggle").addEventListener("click", (e) => {
+      e.stopPropagation();
+      col.classList.add("collapsed");
+      scheduleSave();
+    });
+    col.addEventListener("click", () => {
+      if (col.classList.contains("collapsed")) {
+        col.classList.remove("collapsed");
+        scheduleSave();
       }
     });
+  }
 
-    refreshUI();
-  </script>
+  let removeClicks = 0;
+  let confirmTimer;
+  const delBtn = col.querySelector(".col-delete");
+  delBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    removeClicks++;
+    if (removeClicks === 1) {
+      delBtn.textContent = "Confirm?";
+      confirmTimer = setTimeout(() => { delBtn.textContent = "Remove"; removeClicks = 0; }, 2500);
+    } else if (removeClicks === 2) {
+      clearTimeout(confirmTimer);
+      col.remove();
+      runCalculations();
+      scheduleSave();
+    }
+  });
+
+  col.querySelector(".btn-add-course").addEventListener("click", (e) => {
+    e.stopPropagation();
+    body.appendChild(createCard("NEW 101 — Custom Course Description", 3));
+    runCalculations();
+    scheduleSave();
+  });
+
+  return col;
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll(".card:not(.dragging)")];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function renderBoard(data) {
+  board.innerHTML = "";
+  data.forEach(item => {
+    const col = createColumnHtml(item.title, item.type, item.collapsed);
+    const body = col.querySelector(".col-body");
+    item.courses.forEach(c => {
+      body.appendChild(createCard(c.text, c.credits));
+    });
+    board.appendChild(col);
+  });
+  
+  const addBlock = document.createElement("div");
+  addBlock.className = "add-col-controls";
+  addBlock.innerHTML = `
+    <button class="btn" id="addSemBtn">+ Add Semester</button>
+    <button class="btn" id="addSumBtn">+ Add Summer</button>
+  `;
+  board.appendChild(addBlock);
+
+  addBlock.querySelector("#addSemBtn").addEventListener("click", () => {
+    const count = board.querySelectorAll(".column:not(.column-summer)").length + 1;
+    board.insertBefore(createColumnHtml(`Added Semester ${count}`, "semester"), addBlock);
+    runCalculations();
+    scheduleSave();
+  });
+
+  addBlock.querySelector("#addSumBtn").addEventListener("click", () => {
+    const count = board.querySelectorAll(".column-summer").length + 1;
+    board.insertBefore(createColumnHtml(`Summer · Added ${count}`, "summer", false), addBlock);
+    runCalculations();
+    scheduleSave();
+  });
+
+  runCalculations();
+}
+
+function runCalculations() {
+  updateColumnGauges();
+  checkPrereqs();
+  updateGlobalStats();
+}
+
+function checkMissingCourses() {
+  let missing = 0;
+  const currentTitles = new Map();
+  board.querySelectorAll(".column").forEach(col => {
+    const t = col.querySelector(".col-title").textContent.trim();
+    currentTitles.set(t, [...col.querySelectorAll(".card")].map(c => c.querySelector(".card-text").value.trim()));
+  });
+
+  defaultData.forEach(defCol => {
+    const activeCourses = currentTitles.get(defCol.title.trim()) || [];
+    defCol.courses.forEach(defC => {
+      const idx = activeCourses.indexOf(defC.text.trim());
+      if (idx !== -1) {
+        activeCourses.splice(idx, 1);
+      } else {
+        missing++;
+      }
+    });
+  });
+
+  const restoreBtn = document.getElementById("restoreBtn");
+  if (missing > 0) {
+    restoreBtn.textContent = `Restore ${missing} missing course${missing > 1 ? 's' : ''}`;
+    restoreBtn.style.display = "inline-flex";
+  } else {
+    restoreBtn.style.display = "none";
+  }
+}
+
+function serializeBoard(){
+  return [...board.querySelectorAll('.column')].map(col => ({
+    title: col.querySelector('.col-title').textContent,
+    type: col.classList.contains('column-summer') ? 'summer' : 'semester',
+    collapsed: col.classList.contains('collapsed'),
+    courses: [...col.querySelectorAll('.card')].map(card => ({
+      text: card.querySelector('.card-text').value,
+      credits: parseFloat(card.querySelector('.card-credits').value) || 0,
+    })),
+  }));
+}
+
+async function saveNow(){
+  if(!hasStorage) return;
+  try{
+    saveStatus.textContent = 'Saving…';
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeBoard()));
+    saveStatus.textContent = 'Saved';
+    clearTimeout(saveFadeTimer);
+    saveFadeTimer = setTimeout(() => { saveStatus.textContent = ''; }, 2000);
+  }catch(err){
+    saveStatus.textContent = "Couldn't save session";
+  }
+}
+
+function scheduleSave(){
+  if(!hasStorage) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 700);
+}
+
+async function loadSaved(){
+  if(!hasStorage) return null;
+  try {
+    const value = localStorage.getItem(STORAGE_KEY);
+    if(value) return JSON.parse(value);
+  }catch(err){}
+  return null;
+}
+
+// Full execution logic for the Optimize Schedule system
+function optimizeSchedule() {
+  let sData = serializeBoard();
+  let semesters = sData.filter(c => c.type === "semester");
+  let moved = 0, iteration = 0, modified = true;
+
+  while (modified && iteration < 50) {
+    modified = false;
+    iteration++;
+
+    // Shift down logic for heavy overloads (> 18 credits)
+    for (let i = 0; i < semesters.length - 1; i++) {
+      let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
+      if (load > 18 && semesters[i].courses.length > 0) {
+        const item = semesters[i].courses.pop();
+        semesters[i + 1].courses.unshift(item);
+        moved++;
+        modified = true;
+        break;
+      }
+    }
+
+    // Pull forward logic for critical underloads (< 12 credits)
+    if (!modified) {
+      for (let i = semesters.length - 1; i > 0; i--) {
+        let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
+        if (load < 12 && semesters[i - 1].courses.length > 0) {
+          const item = semesters[i - 1].courses.pop();
+          semesters[i].courses.unshift(item);
+          moved++;
+          modified = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (moved > 0) {
+    // Reassemble full sequence configuration back onto DOM layers
+    let semIdx = 0;
+    const balancedData = sData.map(col => {
+      if (col.type === "semester") {
+        return semesters[semIdx++];
+      }
+      return col;
+    });
+    
+    renderBoard(balancedData);
+    saveNow();
+    saveStatus.textContent = `Balanced layout: arranged ${moved} courses`;
+    setTimeout(() => { saveStatus.textContent = ''; }, 3000);
+  } else {
+    saveStatus.textContent = "Schedule load is already optimized!";
+    setTimeout(() => { saveStatus.textContent = ''; }, 2500);
+  }
+}
+
+const hasStorage = typeof Storage !== 'undefined' && !!window.localStorage;
+
+(async function init(){
+  buildLegend();
+  const saved = await loadSaved();
+  if(saved) {
+    renderBoard(saved);
+  } else {
+    renderBoard(defaultData);
+  }
+
+  document.getElementById("optimizeBtn").addEventListener("click", optimizeSchedule);
+
+  document.getElementById("restoreBtn").addEventListener("click", () => {
+    const currentTitles = new Map();
+    board.querySelectorAll(".column").forEach(col => {
+      const t = col.querySelector(".col-title").textContent.trim();
+      currentTitles.set(t, [...col.querySelectorAll(".card")].map(c => c.querySelector(".card-text").value.trim()));
+    });
+
+    defaultData.forEach(defCol => {
+      const colNode = [...board.querySelectorAll(".column")].find(col => col.querySelector(".col-title").textContent.trim() === defCol.title.trim());
+      if (!colNode) return;
+      const body = colNode.querySelector(".col-body");
+      const activeCourses = currentTitles.get(defCol.title.trim()) || [];
+
+      defCol.courses.forEach(defC => {
+        const idx = activeCourses.indexOf(defC.text.trim());
+        if (idx !== -1) {
+          activeCourses.splice(idx, 1);
+        } else {
+          body.appendChild(createCard(defC.text, defC.credits));
+        }
+      });
+    });
+    runCalculations();
+    saveNow();
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    let output = "PETROLEUM ENGINEERING PLAN OF STUDY\n====================================\n\n";
+    board.querySelectorAll(".column").forEach(col => {
+      if (col.classList.contains("collapsed")) return;
+      output += `${col.querySelector(".col-title").textContent}:\n`;
+      col.querySelectorAll(".card").forEach(card => {
+        output += `  - ${card.querySelector(".card-text").value} (${card.querySelector(".card-credits").value} cr)\n`;
+      });
+      output += "\n";
+    });
+    navigator.clipboard.writeText(output).then(() => {
+      const original = copyBtn.textContent;
+      copyBtn.textContent = "Copied ✓";
+      setTimeout(() => copyBtn.textContent = original, 1500);
+    });
+  });
+
+  document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+  let resetClicks = 0;
+  let resetTimer;
+  const resetBtn = document.getElementById("resetBtn");
+  resetBtn.addEventListener("click", () => {
+    resetClicks++;
+    if (resetClicks === 1) {
+      resetBtn.classList.add("confirming");
+      resetBtn.textContent = "Click again to confirm";
+      resetTimer = setTimeout(() => {
+        resetBtn.classList.remove("confirming");
+        resetBtn.textContent = "Reset to default plan";
+        resetClicks = 0;
+      }, 2500);
+    } else if (resetClicks === 2) {
+      clearTimeout(resetTimer);
+      resetBtn.classList.remove("confirming");
+      resetBtn.textContent = "Reset to default plan";
+      resetClicks = 0;
+      localStorage.removeItem(STORAGE_KEY);
+      renderBoard(defaultData);
+    }
+  });
+})();
+</script>
 </body>
 </html>

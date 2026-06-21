@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modular PGE Plan of Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E7; --charcoal:#262220; --orange:#BF5700; --orange-deep:#8C3F00;
+    --orange-tint:#FBE2C7; --slate:#5C6670; --white:#FFFFFF; --border:#E3D6BF;
+    --green:#3F7D52; --amber:#C9821B; --red:#B5402E;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--cream); color:var(--charcoal); font-family:'Space Grotesk', sans-serif; }
+  .app{ max-width:1500px; margin:0 auto; padding:2rem 1.5rem; }
+  h1{ font-family:'Fraunces', serif; font-size:2.5rem; margin:0 0 .5rem; }
+  .header-actions{ display:flex; gap:.7rem; align-items:center; margin-bottom:1.5rem; }
+  .btn{ border:1.5px solid var(--orange); background:var(--white); color:var(--orange-deep); font-weight:600; font-size:.85rem; padding:.55rem 1.1rem; border-radius:7px; cursor:pointer; }
+  .btn:hover{ background:var(--orange); color:var(--white); }
+  .btn-opt{ border-color:var(--green); color:var(--green); }
+  .btn-opt:hover{ background:var(--green); color:var(--white); }
+  
+  .board{ display:flex; gap:1.1rem; overflow-x:auto; padding-bottom:1rem; }
+  .column{ flex:0 0 260px; background:var(--white); border:1px solid var(--border); border-top:5px solid var(--orange); border-radius:10px; display:flex; flex-direction:column; }
+  .col-header{ padding:.85rem; border-bottom:1px solid var(--border); }
+  .col-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; }
+  .col-body{ flex:1; padding:.75rem; display:flex; flex-direction:column; gap:.55rem; min-height:100px; }
+  
+  /* Highlight Paths Classes */
+  .card{ background:var(--cream); border:1px solid var(--border); border-left:4px solid var(--subj-color, var(--border)); border-radius:8px; padding:.6rem; position:relative; transition: all 0.25s ease; }
+  .card.path-prereq { border-color: var(--red) !important; box-shadow: 0 0 8px rgba(181, 64, 46, 0.4); transform: scale(1.02); }
+  .card.path-dependent { border-color: var(--green) !important; box-shadow: 0 0 8px rgba(63, 125, 82, 0.4); transform: scale(1.02); }
+  
+  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+  .card-text{ font-size:.85rem; font-weight:500; outline:none; }
+  .menu-trigger{ background:none; border:none; color:var(--slate); cursor:pointer; font-size:1rem; padding:0 .2rem; }
+  .card-foot{ margin-top:.5rem; display:flex; justify-content:space-between; font-size:.7rem; color:var(--slate); align-items:center; }
+  
+  /* Dropdown Menu Style */
+  .context-menu{ position:absolute; background:var(--white); border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.15); border-radius:6px; z-index:2000; padding:.4rem 0; max-height:200px; overflow-y:auto; }
+  .menu-item{ padding:.4rem 1rem; font-size:.8rem; cursor:pointer; display:block; width:100%; text-align:left; border:none; background:none; }
+  .menu-item:hover{ background:var(--orange-tint); color:var(--orange-deep); }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Petroleum Engineering <em>Study Planner</em></h1>
+  <div class="header-actions">
+    <button class="btn btn-opt" id="optimizeBtn">Optimize & Fix Sequencing</button>
+  </div>
+  <div class="board" id="board"></div>
+</div>
+
+<script type="module">
+  import { PlanStore } from './state.js';
+  import { renderBoard } from './components.js';
+
+  window.store = new PlanStore();
+  
+  // Initial Sync Run
+  const refreshUI = () => renderBoard(document.getElementById('board'), window.store);
+  window.store.subscribe(refreshUI);
+  refreshUI();
+
+  document.getElementById('optimizeBtn').addEventListener('click', () => {
+    window.store.optimizeAndFixSequencing();
+  });
+</script>
+</body>
+</html>

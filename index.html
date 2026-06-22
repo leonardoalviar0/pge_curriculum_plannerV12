@@ -85,8 +85,6 @@
   .btn:hover{ background:#FAF6EE; }
   .btn-optimize{ border-color:var(--green); color:var(--green); }
   .btn-optimize:hover{ background:#EEF7F2; }
-  .btn-restore{ border-color:var(--amber); color:var(--amber); display:none; }
-  .btn-restore:hover{ background:#FFF9EE; }
   .btn-outline{ border-color:var(--orange); color:var(--orange-deep); }
   .btn-outline:hover{ background:var(--orange-tint); }
   .btn-reset{ border-color:var(--charcoal); }
@@ -96,7 +94,6 @@
     font-weight:600;
     color:var(--green);
     margin-left:0.5rem;
-    transition:opacity 0.2s ease;
   }
   .instructions{
     max-width:800px;
@@ -106,7 +103,6 @@
     opacity:0.8;
   }
   
-  /* AP Score Report Importer Components Layout */
   .ap-drop-zone {
     background: #FAF6EE;
     border: 2px dashed var(--orange);
@@ -117,15 +113,13 @@
     margin: 0 auto 1.5rem auto;
     font-size: 0.88rem;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s, border-color 0.2s;
   }
   .ap-drop-zone.drag-over {
     background: var(--orange-tint);
     border-color: var(--orange-deep);
   }
-  .ap-zone-text strong { color: var(--orange-deep); }
   
-  /* AP Dynamic Eligibility Highlights styles */
   .card.ap-eligible {
     border: 2px dashed var(--green) !important;
     background: #F2FAF4 !important;
@@ -140,7 +134,6 @@
     border-radius: 4px;
     margin-top: 0.25rem;
     display: inline-block;
-    letter-spacing: 0.3px;
   }
 
   .legend{
@@ -179,41 +172,11 @@
     display:flex;
     flex-direction:column;
     box-shadow:0 2px 4px rgba(38,34,32,0.04);
-    transition: width 0.2s ease, background-color 0.2s ease;
   }
-  .column-summer{ border-top-color:var(--amber); }
-  
-  .column.collapsed{
-    width:50px;
-    min-height:450px;
-    background:#EFEAE0;
-    border-top-color:var(--border);
-    cursor:pointer;
-    position:relative;
-  }
-  .column.collapsed .collapsed-title{
-    writing-mode:vertical-rl;
-    text-orientation:mixed;
-    font-family:'Fraunces', serif;
-    font-size:0.95rem;
-    font-weight:600;
-    position:absolute;
-    top:1.5rem;
-    left:50%;
-    transform:translate(-50%, 0) rotate(180deg);
-    white-space:nowrap;
-    opacity:0.7;
-    display:block;
-  }
-  .column.collapsed * { display:none; }
-  .column.collapsed .collapsed-title { display:block; }
-  .collapsed-title { display:none; }
-
   .col-header{ padding:1rem; border-bottom:1px solid var(--border); background:#FAF8F5; border-radius:11px 11px 0 0; }
   .col-title-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
   .col-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; }
   .col-delete{ background:none; border:none; color:var(--red); font-size:0.75rem; cursor:pointer; font-weight:600; }
-  .summer-toggle{ font-size:0.75rem; color:var(--slate); background:none; border:none; cursor:pointer; text-decoration:underline; }
   
   .gauge-wrap{ width:100%; margin-top:0.3rem; }
   .gauge-text{ font-size:0.72rem; font-weight:600; margin-bottom:0.2rem; display:flex; justify-content:space-between; }
@@ -222,16 +185,12 @@
   .gauge-fill.light{ background:var(--amber); }
   .gauge-fill.track{ background:var(--green); }
   .gauge-fill.heavy{ background:var(--red); }
-  .summer-hrs{ font-size:0.75rem; font-weight:600; opacity:0.7; }
 
-  .col-body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem; min-height:200px; background:#FCFAF7; }
+  .col-body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem; min-height:250px; background:#FCFAF7; }
   .col-body.drag-over { background:#F3EDE2; border-radius:0 0 8px 8px; }
   
   .col-footer{ padding:0.6rem 0.75rem; border-top:1px dashed var(--border); background:#FAF8F5; border-radius:0 0 11px 11px; }
   .btn-add-course{ width:100%; background:none; border:1px dashed var(--border); padding:0.4rem; font-size:0.78rem; font-weight:600; border-radius:6px; cursor:pointer; color:var(--slate); }
-  .btn-add-course:hover{ background:var(--white); border-color:var(--orange); color:var(--orange); }
-
-  .add-col-controls{ display:flex; flex-direction:column; gap:0.6rem; align-self:flex-start; }
 
   .card{
     background:var(--white);
@@ -245,41 +204,20 @@
     gap:0.4rem;
     align-items:start;
     cursor:grab;
-    user-select:none;
-    transition:transform 0.1s ease, box-shadow 0.1s ease;
   }
-  .card:active { cursor:grabbing; }
-  .card.dragging { opacity:0.4; transform:scale(0.98); }
-  
-  .card-handle{ color:#A0A0A0; font-size:1.1rem; padding-right:0.1rem; line-height:1; pointer-events:none; }
+  .card-handle{ color:#A0A0A0; font-size:1.1rem; pointer-events:none; }
   .card-mid{ display:flex; flex-direction:column; gap:0.3rem; }
   .card-text{ font-size:0.82rem; font-weight:600; border:none; background:transparent; color:var(--charcoal); width:100%; outline:none; }
-  .card-text:focus{ background:#FAF6EE; box-shadow:0 0 0 2px var(--orange-tint); border-radius:3px; }
   
   .card-meta{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; }
   .card-cr-wrap{ display:flex; align-items:center; font-size:0.72rem; font-weight:500; color:var(--slate); }
-  .card-credits{ width:28px; border:1px solid var(--border); border-radius:4px; padding:0.1rem; text-align:center; font-family:inherit; font-size:0.72rem; font-weight:600; margin-right:0.15rem; }
-  .badge{ font-size:0.62rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:4px; color:var(--white); }
+  .card-credits{ width:28px; border:1px solid var(--border); border-radius:4px; padding:0.1rem; text-align:center; font-size:0.72rem; font-weight:600; margin-right:0.15rem; }
 
-  .card-right{ display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; height:100%; min-height:42px; }
-  .btn-del-card{ background:none; border:none; color:#A0A0A0; cursor:pointer; font-size:1rem; line-height:1; padding:0; }
+  .card-right{ display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; height:100%; }
+  .btn-del-card{ background:none; border:none; color:#A0A0A0; cursor:pointer; font-size:1rem; }
   .btn-del-card:hover{ color:var(--red); }
-  .warn-icon{ width:16px; height:16px; background:var(--red); color:var(--white); font-weight:700; font-size:0.65rem; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:help; }
-
-  footer{ max-width:1400px; margin:3rem auto 0 auto; padding-top:1.2rem; border-top:1px solid var(--border); font-size:0.78rem; opacity:0.6; text-align:center; line-height:1.4; }
-
-  @media print{
-    body{ background:var(--white); color:#000; padding:0; }
-    header, .instructions, .legend, .actions, footer, .add-col-controls, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle, .ap-drop-zone{ display:none !important; }
-    .board{ display:grid; grid-template-columns:repeat(4, 1fr); gap:4mm; width:100%; }
-    .column{ width:100% !important; page-break-inside:avoid; border:1px solid #000; box-shadow:none; }
-    .column.collapsed{ display:flex !important; height:auto; background:var(--white); }
-    .column.collapsed * { display:flex !important; }
-    .column.collapsed .collapsed-title { display:none !important; }
-    .col-body{ background:var(--white); min-height:auto; }
-    .card{ page-break-inside:avoid; border:1px solid #CCC; box-shadow:none; grid-template-columns:1fr auto; cursor:default; }
-    .card-credits{ border:none; background:transparent; }
-  }
+  
+  footer{ max-width:1400px; margin:3rem auto 0 auto; padding-top:1.2rem; border-top:1px solid var(--border); font-size:0.78rem; opacity:0.6; text-align:center; }
 </style>
 </head>
 <body>
@@ -289,22 +227,20 @@
     <div class="header-main">
       <h1>Petroleum Engineering <em>Plan of Study</em></h1>
       <div class="actions">
-        <button class="btn btn-restore" id="restoreBtn">Restore missing courses</button>
         <button class="btn btn-optimize" id="optimizeBtn">Optimize schedule</button>
         <button class="btn btn-outline" id="copyBtn">Copy as text</button>
-        <button class="btn btn-outline" id="printBtn">Print plan</button>
         <button class="btn btn-reset" id="resetBtn">Reset to default plan</button>
         <span class="status-msg" id="saveStatus"></span>
       </div>
     </div>
     
     <p class="instructions">
-      Drag and drop course cards to organize semesters. Drop an AP text report from College Board below to match UT's credit guidelines and flag removable courses.
+      Drag and drop courses to rebalance layouts. Drop your College Board PDF/TXT text report below to match UT Austin guidelines.
     </p>
 
     <div class="ap-drop-zone" id="apDropZone">
       <div class="ap-zone-text" id="apZoneText">
-        <strong>✈ Import AP Scores:</strong> Drag and drop your plain text file (`.txt`) containing College Board score summaries here to flag and highlight test-exempt credit claims!
+        <strong>✈ Import AP Scores:</strong> Drag and drop your text summary or raw report text file here to auto-flag exclusions.
       </div>
     </div>
 
@@ -314,10 +250,6 @@
       <div class="stat-card">
         <div class="stat-label">Total Credit Hours</div>
         <div class="stat-val" id="statTotalHours">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Degree Plan Target</div>
-        <div class="stat-val">128 <span style="font-size:0.9rem; font-weight:500; opacity:0.6;">hrs</span></div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Degree Plan Variance</div>
@@ -331,7 +263,7 @@
   </div>
 
   <footer>
-    This application serves strictly as an interactive prototyping tool. It does not constitute an official degree audit system. Always verify final graduation tracks, prerequisite dependencies, and registration constraints directly with your Cockrell School academic advisor.
+    Prototyping system. Cross-verify credit claim logic records with your Cockrell engineering advisor.
   </footer>
 
 <script>
@@ -339,72 +271,354 @@ const PREREQS = {
   "M 408D": ["M 408C"],
   "M 427J": ["M 408D"],
   "PHY 303L": ["PHY 303K"],
-  "CH 302": ["CH 301"],
-  "E M 319": ["E M 306"],
-  "PGE 323L": ["PGE 323K"],
-  "HIS 315L": ["HIS 315K"]
+  "CH 302": ["CH 301"]
 };
 
-const CO_REQS = {
-  "PHY 303K": "PHY 105M",
-  "PHY 105M": "PHY 303K",
-  "PHY 303L": "PHY 105N",
-  "PHY 105N": "PHY 303L"
-};
-
-// COMPREHENSIVE UT AUSTIN AP SCORE EXEMPTION DICTIONARY
 const UT_AP_POLICY = {
   "Calculus AB": { minScore: 3, claims: ["M 408C"] },
-  "Calculus BC": { minScore: 3, claims: ["M 408C", "M 408D"] }, // Note: Score of 3+ gives credit for both sequences
-  "Chemistry": { 
-    minScore: 3, 
-    evaluator: (score) => score >= 4 ? ["CH 301", "CH 302"] : ["CH 301"] // 4+ maps out foundational logic sequence completely
-  },
-  "Physics C: Mechanics": { minScore: 3, claims: ["PHY 303K", "PHY 105M"] }, // Engineering Physics 1 track variant
-  "Physics C: Electricity and Magnetism": { minScore: 3, claims: ["PHY 303L", "PHY 105N"] }, // Engineering Physics 2 track variant
+  "Calculus BC": { minScore: 3, claims: ["M 408C", "M 408D"] },
+  "Chemistry": { minScore: 3, claims: ["CH 301"] },
+  "Computer Science A": { minScore: 3, claims: ["PGE 311"] },
   "English Language and Composition": { minScore: 3, claims: ["RHE 306"] },
-  "English Literature and Composition": { minScore: 3, claims: ["E 316"] }, // Clears core masterworks requirement layout block
-  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] }, // Maps legislative core blocks completely
-  "American Government": { minScore: 3, claims: ["GOV 310L"] },
-  "Comparative Government and Politics": { minScore: 3, claims: ["GOV 312L"] },
-  "Microeconomics": { minScore: 3, claims: ["Social & Behavioral Sciences"] }, // Fulfills generic elective social requirement core
-  "Macroeconomics": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
-  "Psychology": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
-  "Art History": { minScore: 3, claims: ["Visual & Performing Arts"] }, // Fulfills general VAPA arts credit component
-  "Music Theory": { minScore: 3, claims: ["Visual & Performing Arts"] },
-  "Studio Art: 2-D Design": { minScore: 3, claims: ["Visual & Performing Arts"] },
-  "Studio Art: 3-D Design": { minScore: 3, claims: ["Visual & Performing Arts"] },
-  "Studio Art: Drawing": { minScore: 3, claims: ["Visual & Performing Arts"] },
-  "Human Geography": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
-  "Environmental Science": { minScore: 3, claims: ["GEO 303"] } // Environmental sciences maps cleanly to foundational geology elective alternative track
+  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] }
 };
 
 const SUBJECT_MAP = [
-  { test: /^PGE\b/i, abbrev: "PGE", label: "Petroleum (PGE)", color: "#BF5700", bg: "#FFF2E6" },
-  { test: /^M\s?\d/i, abbrev: "MATH", label: "Math (M)", color: "#2E5C8A", bg: "#EEF4FA" },
-  { test: /^PHY\b/i, abbrev: "PHYS", label: "Physics (PHY)", color: "#6B4E96", bg: "#F4F0FA" },
-  { test: /^CH\s?\d/i, abbrev: "CHEM", label: "Chemistry (CH)", color: "#1F7A6B", bg: "#EEFAF7" },
-  { test: /^E\s?M\b/i, abbrev: "E M", label: "Engr Mechanics", color: "#45607A", bg: "#F0F4F7" },
-  { test: /^GEO\b/i, abbrev: "GEO", label: "Geosciences (GEO)", color: "#8B5E34", bg: "#FAF3EC" },
-  { test: /^RHE\b/i, abbrev: "COMM", label: "Writing / Comm", color: "#8E3B46", bg: "#FCEFEF" },
-  { test: /^Tech Area Elective/i, abbrev: "ELEC", label: "Tech Elective", color: "#6F5B96", bg: "#F5F0FB" },
-  { test: /^(HIS|GOV|UGS|E\s?\d|Visual|Soc)/i, abbrev: "CORE", label: "Core Curriculum", color: "#8A7A3D", bg: "#FAF7EE" },
-  { test: /.*/, abbrev: "—", label: "Other / Unsorted", color: "#6B7280", bg: "#F3F4F6" }
+  { test: /^PGE\b/i, label: "Petroleum (PGE)", color: "#BF5700" },
+  { test: /^M\s?\d/i, label: "Math (M)", color: "#2E5C8A" },
+  { test: /^PHY\b/i, label: "Physics (PHY)", color: "#6B4E96" },
+  { test: /^CH\s?\d/i, label: "Chemistry (CH)", color: "#1F7A6B" },
+  { test: /.*/, label: "Core / General", color: "#8A7A3D" }
 ];
 
 const defaultData = [
-  { title: "Summer · Before Year 1", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 1", type: "semester", courses: [
     { text: "GEO 303 — Introduction to Geology", credits: 3 },
     { text: "CH 301 — Principles of Chemistry I", credits: 3 },
     { text: "M 408C — Differential & Integral Calculus", credits: 4 },
     { text: "RHE 306 — Rhetoric and Writing", credits: 3 },
-    { text: "UGS 302 — First-Year Signature Course", credits: 3 }
+    { text: "PGE 311 — Numerical Methods", credits: 3 }
   ]},
   { title: "Spring · Year 1", type: "semester", courses: [
     { text: "PHY 303K — Engineering Physics I", credits: 3 },
-    { text: "PHY 105M — Laboratory For Physics I", credits: 1 },
-    { text: "M 408D — Sequences, Series, and Multivariable", credits: 4 },
-    { text: "PGE 301 — Introduction to Petroleum Engineering", credits: 3 },
+    { text: "M 408D — Sequences, Series, and Multi", credits: 4 },
     { text: "CH 302 — Principles of Chemistry II", credits: 3 },
-    { text: "Social & Behavioral Sciences",
+    { text: "HIS 315K — US History I", credits: 3 }
+  ]},
+  { title: "Fall · Year 2", type: "semester", courses: [
+    { text: "M 427J — Differential Equations", credits: 4 },
+    { text: "PGE 323K — Reservoir Engineering I", credits: 3 },
+    { text: "HIS 315L — US History II", credits: 3 }
+  ]}
+];
+
+let dragSrcEl = null;
+
+function getCourseCode(text) {
+  const match = text.match(/^([A-Z]{2,3}\s?\d{3}[A-Z]?)/i);
+  return match ? match[1].replace(/\s+/g, ' ').toUpperCase() : "";
+}
+
+function buildLegend() {
+  const container = document.getElementById("legend");
+  container.innerHTML = "";
+  SUBJECT_MAP.forEach(item => {
+    if (item.label.includes("—")) return;
+    const div = document.createElement("div");
+    div.className = "legend-item";
+    div.innerHTML = `<span class="legend-dot" style="background:${item.color}"></span><span>${item.label}</span>`;
+    container.appendChild(div);
+  });
+}
+
+function updateCardBorder(card, text) {
+  const code = getCourseCode(text);
+  const matched = SUBJECT_MAP.find(s => s.test.test(code)) || SUBJECT_MAP[SUBJECT_MAP.length - 1];
+  card.style.borderLeftColor = matched.color;
+}
+
+function runCalculations() {
+  let totalHours = 0;
+  const board = document.getElementById("board");
+  const columns = board.querySelectorAll(".column");
+
+  columns.forEach(col => {
+    let colHours = 0;
+    const cards = col.querySelectorAll(".card");
+    cards.forEach(card => {
+      const crInput = card.querySelector(".card-credits");
+      colHours += parseFloat(crInput.value) || 0;
+    });
+    
+    totalHours += colHours;
+    const fill = col.querySelector(".gauge-fill");
+    if (fill) {
+      const pct = Math.min((colHours / 18) * 100, 100);
+      fill.style.width = pct + "%";
+      col.querySelector(".hrs-val").textContent = colHours;
+      
+      fill.className = "gauge-fill " + (colHours > 18 ? "heavy" : colHours >= 12 ? "track" : "light");
+    }
+  });
+
+  document.getElementById("statTotalHours").textContent = totalHours;
+}
+
+function serializeBoard() {
+  const data = [];
+  document.querySelectorAll(".column").forEach(col => {
+    const courses = [];
+    col.querySelectorAll(".card").forEach(card => {
+      courses.push({
+        text: card.querySelector(".card-text").value,
+        credits: parseFloat(card.querySelector(".card-credits").value) || 0
+      });
+    });
+    data.push({
+      title: col.querySelector(".col-title").textContent,
+      type: "semester",
+      courses: courses
+    });
+  });
+  return data;
+}
+
+function saveNow() {
+  localStorage.setItem("pge_timeline_data", JSON.stringify(serializeBoard()));
+}
+
+function optimizeSchedule() {
+  let semesters = serializeBoard();
+  let moved = 0, iteration = 0, modified = true;
+
+  while (modified && iteration < 50) {
+    modified = false;
+    iteration++;
+
+    for (let i = 0; i < semesters.length - 1; i++) {
+      let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
+      if (load > 18 && semesters[i].courses.length > 0) {
+        const item = semesters[i].courses.pop();
+        semesters[i + 1].courses.unshift(item);
+        moved++;
+        modified = true;
+        break; 
+      }
+    }
+
+    if (!modified) {
+      for (let i = 0; i < semesters.length - 1; i++) {
+        let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
+        if (load < 12 && semesters[i + 1].courses.length > 0) {
+          const item = semesters[i + 1].courses.shift();
+          semesters[i].courses.push(item);
+          moved++;
+          modified = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (moved > 0) {
+    renderBoard(semesters);
+    saveNow();
+    document.getElementById("saveStatus").textContent = `Balanced layout: arranged ${moved} courses`;
+    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
+  } else {
+    document.getElementById("saveStatus").textContent = "Schedule load is already optimized!";
+    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 2500);
+  }
+}
+
+function processAPText(text) {
+  let foundCredits = [];
+  
+  // Clean structure arrays for handling multi-line tables seamlessly 
+  const cleanText = text.replace(/[\r\n",]+/g, " ");
+
+  for (const [examName, policy] of Object.entries(UT_AP_POLICY)) {
+    const escapeExam = examName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    // Extracts digit matching your precise report format directly 
+    const regex = new RegExp(`${escapeExam}\\s*(\\d)`, "i");
+    const match = cleanText.match(regex);
+
+    if (match) {
+      const score = parseInt(match[1]);
+      if (score >= policy.minScore) {
+        foundCredits.push(...policy.claims);
+      }
+    }
+  }
+
+  if (foundCredits.length > 0) {
+    document.querySelectorAll(".card").forEach(card => {
+      const currentCode = getCourseCode(card.querySelector(".card-text").value);
+      if (foundCredits.includes(currentCode)) {
+        card.classList.add("ap-eligible");
+        if (!card.querySelector(".ap-claim-badge")) {
+          const badge = document.createElement("span");
+          badge.className = "ap-claim-badge";
+          badge.textContent = "AP CLAIM ELIGIBLE";
+          card.querySelector(".card-meta").appendChild(badge);
+        }
+      }
+    });
+    document.getElementById("apZoneText").innerHTML = `<strong>✓ Success!</strong> Found credits for: ${foundCredits.join(", ")}. Matches highlighted in green.`;
+  } else {
+    alert("Could not extract score matrix configurations. Double check raw text data configurations.");
+  }
+}
+
+function renderBoard(data) {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+
+  data.forEach(colData => {
+    const col = document.createElement("div");
+    col.className = "column";
+    
+    col.innerHTML = `
+      <div class="col-header">
+        <div class="col-title-row">
+          <span class="col-title">${colData.title}</span>
+          <button class="col-delete">×</button>
+        </div>
+        <div class="gauge-wrap">
+          <div class="gauge-text"><span>Load Balance</span><span><span class="hrs-val">0</span>/18 cr</span></div>
+          <div class="gauge-bg"><div class="gauge-fill"></div></div>
+        </div>
+      </div>
+      <div class="col-body"></div>
+      <div class="col-footer">
+        <button class="btn-add-course">+ Add Course Node</button>
+      </div>
+    `;
+
+    const body = col.querySelector(".col-body");
+
+    col.querySelector(".col-delete").addEventListener("click", () => {
+      col.remove();
+      runCalculations();
+      saveNow();
+    });
+
+    col.querySelector(".btn-add-course").addEventListener("click", () => {
+      const newCard = createCard("NEW 101 — Custom Course Element", 3);
+      body.appendChild(newCard);
+      runCalculations();
+      saveNow();
+    });
+
+    // Drag-over adjustments
+    body.addEventListener("dragover", (e) => { e.preventDefault(); body.classList.add("drag-over"); });
+    body.addEventListener("dragleave", () => body.classList.remove("drag-over"));
+    body.addEventListener("drop", (e) => {
+      e.preventDefault();
+      body.classList.remove("drag-over");
+      if (dragSrcEl && dragSrcEl !== e.target) {
+        body.appendChild(dragSrcEl);
+        runCalculations();
+        saveNow();
+      }
+    });
+
+    colData.courses.forEach(c => {
+      body.appendChild(createCard(c.text, c.credits));
+    });
+
+    board.appendChild(col);
+  });
+
+  runCalculations();
+}
+
+function createCard(text, credits) {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.draggable = true;
+
+  card.innerHTML = `
+    <div class="card-handle">⋮</div>
+    <div class="card-mid">
+      <input type="text" class="card-text" value="${text}">
+      <div class="card-meta">
+        <div class="card-cr-wrap">
+          <input type="number" class="card-credits" value="${credits}" min="0" max="6" step="0.5">
+          <span>cr</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-right">
+      <button class="btn-del-card">×</button>
+    </div>
+  `;
+
+  const txtInput = card.querySelector(".card-text");
+  const crInput = card.querySelector(".card-credits");
+
+  updateCardBorder(card, text);
+
+  txtInput.addEventListener("change", () => { updateCardBorder(card, txtInput.value); saveNow(); });
+  crInput.addEventListener("change", () => { runCalculations(); saveNow(); });
+  card.querySelector(".btn-del-card").addEventListener("click", () => { card.remove(); runCalculations(); saveNow(); });
+
+  // Native Drag API Hooks
+  card.addEventListener("dragstart", (e) => { dragSrcEl = card; card.style.opacity = "0.4"; });
+  card.addEventListener("dragend", () => { dragSrcEl = null; card.style.opacity = "1"; });
+
+  return card;
+}
+
+function init() {
+  buildLegend();
+  const saved = localStorage.getItem("pge_timeline_data");
+  
+  try {
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        renderBoard(parsed);
+      } else {
+        renderBoard(defaultData);
+      }
+    } else {
+      renderBoard(defaultData);
+    }
+  } catch(e) {
+    renderBoard(defaultData);
+  }
+
+  // File Drop Processing Setup
+  const zone = document.getElementById("apDropZone");
+  zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("drag-over"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
+  zone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    zone.classList.remove("drag-over");
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => processAPText(evt.target.result);
+    reader.readAsText(file);
+  });
+
+  document.getElementById("optimizeBtn").addEventListener("click", optimizeSchedule);
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (confirm("Reset layout tracks back to foundational structure default sequence?")) {
+      localStorage.removeItem("pge_timeline_data");
+      renderBoard(defaultData);
+    }
+  });
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    const rawText = JSON.stringify(serializeBoard(), null, 2);
+    navigator.clipboard.writeText(rawText);
+    alert("Timeline tracking configuration array exported to operational clipboard!");
+  });
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

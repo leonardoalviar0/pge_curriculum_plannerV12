@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PGE Plan of Study + Advanced AP Engine</title>
+<title>PGE Curriculum Planner — Production Engine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,11 +30,10 @@
   .btn:hover{ background:#FAF6EE; }
   .btn-optimize{ border-color:var(--green); color:var(--green); }
   .btn-optimize:hover{ background:#EEF7F2; }
-  .btn-restore{ border-color:var(--amber); color:var(--amber); }
+  .btn-restore{ border-color:var(--amber); color:var(--amber); display:none; }
   .btn-restore:hover{ background:#FFF9EE; }
   .btn-outline{ border-color:var(--orange); color:var(--orange-deep); }
   .btn-outline:hover{ background:var(--orange-tint); }
-  .btn-reset{ border-color:var(--charcoal); }
   
   .status-msg{ font-size:0.85rem; font-weight:600; color:var(--green); margin-left:0.5rem; }
   .instructions{ max-width:900px; font-size:0.95rem; line-height:1.5; margin:0 0 1.5rem 0; opacity:0.8; }
@@ -53,9 +52,11 @@
   .legend-dot{ width:10px; height:10px; border-radius:50%; }
   
   .stats{ display:flex; gap:1.5rem; margin-bottom:2rem; flex-wrap:wrap; }
-  .stat-card{ background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1.25rem; min-width:160px; }
+  .stat-card{ background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1.25rem; min-width:180px; }
   .stat-label{ font-size:0.7rem; font-weight:700; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px; }
   .stat-val{ font-size:1.6rem; font-weight:700; margin-top:0.2rem; }
+  .stat-val.violation { color: var(--red); }
+  .stat-val.clean { color: var(--green); }
   
   .board-outer{ width:100%; overflow-x:auto; padding-bottom:1rem; }
   .board{ display:flex; gap:1.2rem; align-items:flex-start; padding:0.2rem; width:max-content; }
@@ -63,10 +64,10 @@
   .column{
     width:290px; background:var(--white); border:1px solid var(--border); border-top:5px solid var(--orange);
     border-radius:12px; display:flex; flex-direction:column; box-shadow:0 2px 4px rgba(38,34,32,0.04);
-    transition: width 0.2s, background-color 0.2s;
+    transition: width 0.2s, background-color 0.2s; position: relative;
   }
   .column-summer{ border-top-color:var(--amber); }
-  .column.collapsed{ width:50px; min-height:500px; background:#EFEAE0; border-top-color:var(--border); cursor:pointer; position:relative; }
+  .column.collapsed{ width:50px; min-height:500px; background:#EFEAE0; border-top-color:var(--border); cursor:pointer; }
   .column.collapsed .collapsed-title{
     writing-mode:vertical-rl; text-orientation:mixed; font-family:'Fraunces', serif; font-size:0.95rem;
     font-weight:600; position:absolute; top:1.5rem; left:50%; transform:translate(-50%, 0) rotate(180deg); white-space:nowrap; opacity:0.7;
@@ -78,8 +79,9 @@
   .col-header{ padding:1rem; border-bottom:1px solid var(--border); background:#FAF8F5; border-radius:11px 11px 0 0; }
   .col-title-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
   .col-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; }
-  .col-delete{ background:none; border:none; color:var(--red); font-size:0.75rem; cursor:pointer; font-weight:600; }
-  .summer-toggle{ font-size:0.75rem; color:var(--slate); background:none; border:none; cursor:pointer; text-decoration:underline; }
+  .col-delete{ background:none; border:none; color:var(--slate); font-size:1.1rem; cursor:pointer; font-weight:600; padding:0 0.2rem; }
+  .col-delete:hover{ color:var(--red); }
+  .summer-toggle{ font-size:0.72rem; color:var(--slate); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; margin-top:0.2rem;}
   
   .gauge-wrap{ width:100%; margin-top:0.3rem; }
   .gauge-text{ font-size:0.72rem; font-weight:600; margin-bottom:0.2rem; display:flex; justify-content:space-between; }
@@ -92,20 +94,20 @@
   .col-body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem; min-height:300px; background:#FCFAF7; transition: background-color 0.15s; }
   .col-body.drag-over { background:#F3EDE2; }
   
-  .col-footer{ padding:0.6rem 0.75rem; border-top:1px dashed var(--border); background:#FAF8F5; border-radius:0 0 11px 11px; }
-  .btn-add-course{ width:100%; background:none; border:1px dashed var(--border); padding:0.4rem; font-size:0.78rem; font-weight:600; border-radius:6px; cursor:pointer; color:var(--slate); }
+  .col-footer{ padding:0.6rem 0.75rem; border-top:1px dashed var(--border); background:#FAF8F5; border-radius:0 0 11px 11px; display:flex; gap:0.4rem; }
+  .btn-add-course{ flex:1; background:none; border:1px dashed var(--border); padding:0.4rem; font-size:0.78rem; font-weight:600; border-radius:6px; cursor:pointer; color:var(--slate); }
   .btn-add-course:hover{ border-color:var(--orange); color:var(--orange); }
 
   .card{
     background:var(--white); border:1px solid var(--border); border-left:5px solid #6B7280; border-radius:8px;
     padding:0.65rem; box-shadow:0 1px 3px rgba(38,34,32,0.05); display:grid; grid-template-columns:auto 1fr auto;
-    gap:0.4rem; align-items:start; touch-action:none; position:relative;
+    gap:0.4rem; align-items:start; touch-action:none; position:relative; user-select:none;
   }
-  .card.dragging { opacity:0.5; background:#FCFAF7; border-style:dashed; }
+  .card.dragging { opacity:0.4; background:#FCFAF7; border-style:dashed; }
   .card.ap-eligible { border: 2px dashed var(--green) !important; background: #F2FAF4 !important; }
   .card.prereq-violation { border: 2px solid var(--red) !important; background: #FDF3F2 !important; }
   
-  .card-handle{ color:#A0A0A0; font-size:1.1rem; padding-right:0.1rem; cursor:grab; user-select:none; }
+  .card-handle{ color:#A0A0A0; font-size:1.1rem; padding-right:0.1rem; cursor:grab; user-select:none; width:15px; text-align:center; }
   .card-mid{ display:flex; flex-direction:column; gap:0.25rem; }
   .card-text{ font-size:0.82rem; font-weight:600; border:none; background:transparent; color:var(--charcoal); width:100%; outline:none; }
   .card-text:focus { background:#fff; box-shadow:0 0 0 1px var(--orange); border-radius:4px; }
@@ -121,14 +123,15 @@
   .btn-del-card{ background:none; border:none; color:#A0A0A0; cursor:pointer; font-size:1rem; padding:0; line-height:1; }
   .btn-del-card:hover{ color:var(--red); }
   
-  footer{ max-width:1400px; margin:3rem auto 0 auto; padding-top:1.2rem; border-top:1px solid var(--border); font-size:0.78rem; opacity:0.6; text-align:center; }
-  
-  @media print{
-    body{ background:#fff; padding:0; }
-    .actions, .ap-container, .legend, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle { display:none !important; }
-    .board { display:block; }
-    .column { width:100% !important; margin-bottom:1.5rem; page-break-inside:avoid; }
+  /* Touch Drag Overlay Visual Mirror */
+  .drag-mirror {
+    position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8;
+    background: var(--white); border: 1px solid var(--border); border-left: 5px solid var(--orange);
+    border-radius: 8px; padding: 0.65rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 260px;
+    font-family: inherit; display: none;
   }
+
+  .global-modifiers { max-width:1400px; margin: 0 auto 1rem auto; display:flex; gap:0.75rem; }
 </style>
 </head>
 <body>
@@ -138,7 +141,7 @@
     <div class="header-main">
       <h1>Petroleum Engineering <em>Plan of Study</em></h1>
       <div class="actions">
-        <button class="btn btn-restore" id="restoreBtn">Restore missing courses</button>
+        <button class="btn btn-restore" id="restoreBtn">Restore Missing Courses (0)</button>
         <button class="btn btn-optimize" id="optimizeBtn">Optimize schedule</button>
         <button class="btn btn-outline" id="copyBtn">Copy as text</button>
         <button class="btn btn-reset" id="resetBtn">Reset to default plan</button>
@@ -147,17 +150,22 @@
     </div>
     
     <p class="instructions">
-      Manage your BSPE roadmap. Reorder cards within or between columns to customize scheduling sequence. Drop a text-based College Board PDF/TXT, browse for a file, or paste report text to audit AP exemptions.
+      Interactive multi-touch layout planner mapped to standard UT Austin BSPE tracks. Drag elements from handles to rearrange terms; dependencies and co-requisite labs align automatically on drop.
     </p>
+
+    <div class="global-modifiers">
+      <button class="btn" id="addSemesterBtn">+ Add Semester Column</button>
+      <button class="btn" id="addSummerBtn">+ Add Summer Column</button>
+    </div>
 
     <div class="ap-container">
       <div class="ap-drop-zone" id="apDropZone">
         <div class="ap-zone-text" id="apZoneText">
-          <strong>✈ AP Score Center:</strong> Drag & drop your `Score Report.pdf` text file here, or <u>click to browse</u>.
+          <strong>✈ AP Score Center:</strong> Drag & drop your `Score Report.pdf` text layout here, or <u>click to browse</u>.
         </div>
         <input type="file" id="apFileInput" accept=".txt,.pdf" style="display:none;">
       </div>
-      <textarea class="ap-paste-area" id="apPasteArea" placeholder="...or paste raw copied text contents directly from College Board scorecard report here to trigger immediate parsing evaluations"></textarea>
+      <textarea class="ap-paste-area" id="apPasteArea" placeholder="...or paste raw copied text contents directly from College Board scorecard report here to trigger evaluation loops"></textarea>
     </div>
 
     <div class="legend" id="legend"></div>
@@ -178,12 +186,14 @@
     <div class="board" id="board"></div>
   </div>
 
+  <div class="drag-mirror" id="dragMirror"></div>
+
   <footer>
-    Prototyping timeline terminal layout. Verify curriculum sequencing parameters and prerequisites directly with Cockrell Engineering advising records.
+    Prototyping engine v15.1. Cross-verify credit claim sequences with your Cockrell engineering advisor records.
   </footer>
 
 <script>
-// 1. COMPREHENSIVE RULES MATRIX ARCHITECTURE
+// 1. LOCKED CODE PARSING AND DEPENDENCY STRUCTURES
 const PREREQS = {
   "M 408D": ["M 408C"],
   "M 427J": ["M 408D"],
@@ -192,11 +202,14 @@ const PREREQS = {
   "E M 319": ["E M 306"],
   "PGE 323K": ["M 427J", "PGE 311"],
   "PGE 323L": ["PGE 323K"],
-  "PGE 334": ["E M 319", "M 427J"],
-  "PGE 362": ["PGE 323K"],
-  "PGE 373L": ["PGE 323K", "PGE 323L"],
-  "PGE 430": ["PGE 323K"],
-  "PGE 471": ["PGE 323L", "PGE 334", "PGE 430"]
+  "PGE 322K": ["M 427J"],
+  "PGE 326": ["CH 302", "M 408D"],
+  "PGE 424": ["PGE 322K", "PGE 323K"],
+  "PGE 333T": ["RHE 306"],
+  "PGE 337": ["PGE 323K"],
+  "PGE 358": ["PGE 322K"],
+  "PGE 368": ["PGE 323K", "PGE 322K"],
+  "PGE 430": ["E M 319"]
 };
 
 const CO_REQS = {
@@ -210,21 +223,19 @@ const UT_AP_POLICY = {
   "Chemistry": { minScore: 3, claims: ["CH 301"] },
   "Computer Science A": { minScore: 3, claims: ["PGE 311"] },
   "English Language and Composition": { minScore: 3, claims: ["RHE 306"] },
-  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] },
-  "American Government": { minScore: 3, claims: ["GOV 310L"] }
+  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] }
 };
 
 const SUBJECT_MAP = [
   { test: /^PGE\b/i, label: "Petroleum (PGE)", color: "#BF5700" },
-  { test: /^M\b|^M\s/i, label: "Math (M)", color: "#2E5C8A" },
+  { test: /^M\b|^M\s|^E\s?M\b/i, label: "Math & Mechanics (M / E M)", color: "#2E5C8A" },
   { test: /^PHY\b/i, label: "Physics (PHY)", color: "#6B4E96" },
   { test: /^CH\b/i, label: "Chemistry (CH)", color: "#1F7A6B" },
-  { test: /^E\s?M\b/i, label: "Engineering Mechanics (E M)", color: "#45607A" },
   { test: /^GEO\b/i, label: "Geosciences (GEO)", color: "#8B5E34" },
   { test: /.*/, label: "Core Requirements / Electives", color: "#8A7A3D" }
 ];
 
-// FULL 8-SEMESTER UT AUSTIN BSPE 128-HOUR SEQUENCE
+// 2. LOCKED OFFICIAL 128-HOUR SEQUENCE DATABASE
 const defaultData = [
   { title: "Summer · Before Year 1", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 1", type: "semester", courses: [
@@ -251,42 +262,45 @@ const defaultData = [
   ]},
   { title: "Spring · Year 2", type: "semester", courses: [
     { text: "PGE 323K — Reservoir Engineering I", credits: 3 },
+    { text: "PGE 322K — Transport Phenomena", credits: 3 },
     { text: "E M 319 — Mechanics of Solids", credits: 3 },
-    { text: "HIS 315K — United States History I", credits: 3 },
-    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
+    { text: "PGE 333T — Engineering Communication", credits: 3 },
+    { text: "HIS 315K — United States History I", credits: 3 }
   ]},
   { title: "Summer · Before Year 3", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 3", type: "semester", courses: [
     { text: "PGE 323L — Reservoir Engineering II", credits: 3 },
-    { text: "PGE 362 — Production Engineering", credits: 3 },
+    { text: "PGE 326 — Petrophysics", credits: 3 },
     { text: "PGE 430 — Drilling Engineering", credits: 4 },
     { text: "HIS 315L — United States History II", credits: 3 }
   ]},
   { title: "Spring · Year 3", type: "semester", courses: [
-    { text: "PGE 322K — Transport Phenomena", credits: 3 },
-    { text: "PGE 334 — Reservoir Geomechanics", credits: 3 },
-    { text: "PGE 373L — Geosystems Engineering Lab", credits: 3 },
-    { text: "GOV 312L — Issues & Policies", credits: 3 }
+    { text: "PGE 424 — Petrophysical Logging", credits: 4 },
+    { text: "PGE 337 — Intro to Geostatistics", credits: 3 },
+    { text: "Approved Technical Elective I", credits: 3 },
+    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
   ]},
   { title: "Summer · Before Year 4", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 4", type: "semester", courses: [
-    { text: "PGE 471 — Geosystems Engineering Design", credits: 4 },
-    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
-    { text: "Technical Area Elective I", credits: 3 },
+    { text: "PGE 358 — Principles of Production Eng", credits: 3 },
+    { text: "PGE 368 — Fundamentals of Well Logging", credits: 3 },
+    { text: "Approved Technical Elective II", credits: 3 },
     { text: "Social & Behavioral Sciences", credits: 3 }
   ]},
   { title: "Spring · Year 4", type: "semester", courses: [
-    { text: "PGE 379 — Special Topics", credits: 3 },
-    { text: "Technical Area Elective II", credits: 3 },
-    { text: "E 316L — Masterworks of Literature", credits: 3 }
+    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
+    { text: "Approved Technical Elective III", credits: 3 },
+    { text: "E 316L — Masterworks of Literature", credits: 3 },
+    { text: "GOV 312L — Issues & Policies", credits: 3 }
   ]}
 ];
 
 let activeDragElement = null;
+let touchStartCol = null;
 
-// Improved Course Code Parser to support structured variants like "E M 306"
+// Regex supporting two-word designators like "E M 306" or "GOV 310L"
 function getCourseCode(text) {
-  const match = text.match(/^([A-Z\s]{1,5}\d{3}[A-Z]?)/i);
+  const match = text.match(/^([A-Z\s]{1,6}\d{3}[A-Z]?)/i);
   return match ? match[1].trim().replace(/\s+/g, ' ').toUpperCase() : "";
 }
 
@@ -308,13 +322,13 @@ function updateCardBorder(card, text) {
   card.style.borderLeftColor = matched.color;
 }
 
-// Full Native Dependency Audit Validator
+// 3. RETURNING TRACK EVALUATION ENGINE (VALIDATION & PAIRING)
 function runCalculations() {
   let totalHours = 0;
+  let validationViolations = 0;
   const board = document.getElementById("board");
   const columns = Array.from(board.querySelectorAll(".column"));
   
-  // Track where each class sits chronologically
   const coursePositions = {};
   columns.forEach((col, index) => {
     col.querySelectorAll(".card").forEach(card => {
@@ -325,28 +339,27 @@ function runCalculations() {
 
   columns.forEach((col, colIndex) => {
     let colHours = 0;
-    const cards = col.querySelectorAll(".card");
+    if (col.classList.contains("collapsed")) return;
     
-    cards.forEach(card => {
+    col.querySelectorAll(".card").forEach(card => {
       const text = card.querySelector(".card-text").value;
       const code = getCourseCode(text);
       const crInput = card.querySelector(".card-credits");
       colHours += parseFloat(crInput.value) || 0;
       
-      // Clear legacy error states
       card.classList.remove("prereq-violation");
       const oldBadge = card.querySelector(".badge-violation");
       if (oldBadge) oldBadge.remove();
 
-      // Check prerequisites
       if (code && PREREQS[code]) {
         PREREQS[code].forEach(req => {
           if (coursePositions[req] === undefined || coursePositions[req] >= colIndex) {
             card.classList.add("prereq-violation");
+            validationViolations++;
             if (!card.querySelector(".badge-violation")) {
               const b = document.createElement("span");
               b.className = "badge badge-violation";
-              b.textContent = `Missing Prereq: ${req}`;
+              b.textContent = `Prereq Error: ${req}`;
               card.querySelector(".card-meta").appendChild(b);
             }
           }
@@ -365,6 +378,56 @@ function runCalculations() {
   });
 
   document.getElementById("statTotalHours").textContent = totalHours;
+  const statusLabel = document.getElementById("statVariance");
+  if (validationViolations > 0) {
+    statusLabel.textContent = `${validationViolations} Prereq Warning${validationViolations > 1 ? 's' : ''}`;
+    statusLabel.className = "stat-val violation";
+  } else {
+    statusLabel.textContent = "On Track";
+    statusLabel.className = "stat-val clean";
+  }
+
+  auditMissingCourses();
+}
+
+// Prerequisite-Semester Aware Restore Engine
+function auditMissingCourses() {
+  const currentState = serializeBoard();
+  let missingCount = 0;
+
+  defaultData.forEach(defaultCol => {
+    const matchingActiveCol = currentState.find(c => c.title === defaultCol.title);
+    defaultCol.courses.forEach(dc => {
+      const targetCode = getCourseCode(dc.text);
+      // It is missing if it does not exist *in its designated term*
+      const isPresentInTerm = matchingActiveCol ? matchingActiveCol.courses.some(cx => getCourseCode(cx.text) === targetCode) : false;
+      if (!isPresentInTerm) {
+        missingCount++;
+      }
+    });
+  });
+
+  const restoreBtn = document.getElementById("restoreBtn");
+  if (missingCount > 0) {
+    restoreBtn.style.display = "inline-flex";
+    restoreBtn.textContent = `Restore Missing Courses (${missingCount})`;
+  } else {
+    restoreBtn.style.display = "none";
+  }
+}
+
+function handleAutoLabPairing(movedCard, targetColumnBody) {
+  const code = getCourseCode(movedCard.querySelector(".card-text").value);
+  if (CO_REQS[code]) {
+    const companionCode = CO_REQS[code];
+    document.querySelectorAll(".card").forEach(c => {
+      if (getCourseCode(c.querySelector(".card-text").value) === companionCode && c !== movedCard) {
+        if (c.closest(".col-body") !== targetColumnBody) {
+          targetColumnBody.appendChild(c);
+        }
+      }
+    });
+  }
 }
 
 function serializeBoard() {
@@ -388,134 +451,14 @@ function serializeBoard() {
 }
 
 function saveNow() {
-  localStorage.setItem("pge_timeline_data_v15", JSON.stringify(serializeBoard()));
+  localStorage.setItem("pge_timeline_data_v15_1", JSON.stringify(serializeBoard()));
 }
 
-// Prerequisite-Validated Load-Balancing Optimization Engine
-function optimizeSchedule() {
-  let boardState = serializeBoard();
-  let moved = 0, iteration = 0, modified = true;
-
-  while (modified && iteration < 40) {
-    modified = false;
-    iteration++;
-
-    // 1. Handle Overload States (> 18 cr)
-    for (let i = 0; i < boardState.length - 1; i++) {
-      if (boardState[i].type === "summer") continue;
-      let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
-      
-      if (load > 18 && boardState[i].courses.length > 0) {
-        // Find a candidate course that wouldn't violate target placement parameters
-        let targetIndex = i + 1;
-        if (boardState[targetIndex].type === "summer") targetIndex++; // Skip Summer overflow targets
-        
-        if (targetIndex < boardState.length) {
-          const item = boardState[i].courses.pop();
-          boardState[targetIndex].courses.unshift(item);
-          moved++;
-          modified = true;
-          break;
-        }
-      }
-    }
-
-    // 2. Handle Underload States (< 12 cr)
-    if (!modified) {
-      for (let i = 0; i < boardState.length - 1; i++) {
-        if (boardState[i].type === "summer" || boardState[i].collapsed) continue;
-        let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
-        
-        if (load < 12) {
-          let nextIdx = i + 1;
-          while (nextIdx < boardState.length && boardState[nextIdx].courses.length === 0) { nextIdx++; }
-          
-          if (nextIdx < boardState.length && boardState[nextIdx].courses.length > 0) {
-            // Safety check: Don't pull forward if it breaks prerequisite chains
-            const candidate = boardState[nextIdx].courses[0];
-            const code = getCourseCode(candidate.text);
-            let safe = true;
-            
-            if (PREREQS[code]) {
-              PREREQS[code].forEach(req => {
-                // Find where prerequisite resides
-                let reqInFuture = false;
-                for (let k = i; k < boardState.length; k++) {
-                  if (boardState[k].courses.some(cx => getCourseCode(cx.text) === req)) {
-                    reqInFuture = true;
-                  }
-                }
-                if (reqInFuture) safe = false;
-              });
-            }
-            
-            if (safe) {
-              const item = boardState[nextIdx].courses.shift();
-              boardState[i].courses.push(item);
-              moved++;
-              modified = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  if (moved > 0) {
-    renderBoard(boardState);
-    saveNow();
-    document.getElementById("saveStatus").textContent = `Balanced layout: shifted ${moved} components cleanly`;
-    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
-  } else {
-    document.getElementById("saveStatus").textContent = "Schedule load is optimized or bound by dependency loops!";
-    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 2500);
-  }
-}
-
-function processAPText(text) {
-  let foundCredits = [];
-  const cleanText = text.replace(/[\r\n",]+/g, " ");
-
-  for (const [examName, policy] of Object.entries(UT_AP_POLICY)) {
-    const escapeExam = examName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const regex = new RegExp(`${escapeExam}\\s*(\\d)`, "i");
-    const match = cleanText.match(regex);
-
-    if (match) {
-      const score = parseInt(match[1]);
-      if (score >= policy.minScore) {
-        foundCredits.push(...policy.claims);
-      }
-    }
-  }
-
-  if (foundCredits.length > 0) {
-    document.querySelectorAll(".card").forEach(card => {
-      const currentCode = getCourseCode(card.querySelector(".card-text").value);
-      if (foundCredits.includes(currentCode)) {
-        card.classList.add("ap-eligible");
-        if (!card.querySelector(".ap-claim-badge")) {
-          const badge = document.createElement("span");
-          badge.className = "badge ap-claim-badge";
-          badge.textContent = "AP EXEMPTION MATCH";
-          card.querySelector(".card-meta").appendChild(badge);
-        }
-      }
-    });
-    document.getElementById("apZoneText").innerHTML = `<strong>✓ Exemption Audit Complete:</strong> Cleared tags for: ${foundCredits.join(", ")}. Safe deletions flagged green.`;
-  } else {
-    alert("No eligible AP credit thresholds extracted. Verify text matches the required format.");
-  }
-}
-
-// Robust Micro-Injection Card Placement Engine supporting fine-grained slot insertion
+// 4. MOBILE-TOUCH & REORDER SLOT EVALUATORS
 function setupDragAndDropHandlers(bodyElement) {
   bodyElement.addEventListener("dragover", (e) => {
     e.preventDefault();
     bodyElement.classList.add("drag-over");
-    
-    // Calculate vertical sorting insertion slot position
     const afterElement = getDragAfterElement(bodyElement, e.clientY);
     if (activeDragElement) {
       if (afterElement == null) {
@@ -530,6 +473,9 @@ function setupDragAndDropHandlers(bodyElement) {
   bodyElement.addEventListener("drop", (e) => {
     e.preventDefault();
     bodyElement.classList.remove("drag-over");
+    if (activeDragElement) {
+      handleAutoLabPairing(activeDragElement, bodyElement);
+    }
     runCalculations();
     saveNow();
   });
@@ -574,36 +520,16 @@ function createCard(text, credits) {
 
   updateCardBorder(card, text);
 
-  // Corequisite Auto-Snapping Pairing Logic Engine Hook
-  txtInput.addEventListener("change", () => {
-    updateCardBorder(card, txtInput.value);
-    const code = getCourseCode(txtInput.value);
-    
-    if (CO_REQS[code]) {
-      const coReqTarget = CO_REQS[code];
-      const parentCol = card.closest(".col-body");
-      // Verify if partner corequisite card is missing from current block
-      let partnerExists = false;
-      parentCol.querySelectorAll(".card").forEach(c => {
-        if (getCourseCode(c.querySelector(".card-text").value) === coReqTarget) partnerExists = true;
-      });
-      
-      if (!partnerExists) {
-        // Automatically find and snap corequisite card into this column
-        document.querySelectorAll(".card").forEach(c => {
-          if (getCourseCode(c.querySelector(".card-text").value) === coReqTarget && c !== card) {
-            parentCol.appendChild(c);
-          }
-        });
-      }
-    }
-    runCalculations();
-    saveNow();
+  txtInput.addEventListener("change", () => { 
+    updateCardBorder(card, txtInput.value); 
+    handleAutoLabPairing(card, card.closest(".col-body"));
+    runCalculations(); 
+    saveNow(); 
   });
-
   crInput.addEventListener("change", () => { runCalculations(); saveNow(); });
   card.querySelector(".btn-del-card").addEventListener("click", () => { card.remove(); runCalculations(); saveNow(); });
 
+  // Native Desktop Drag Event Routing
   card.addEventListener("dragstart", (e) => {
     activeDragElement = card;
     card.classList.add("dragging");
@@ -617,21 +543,66 @@ function createCard(text, credits) {
     saveNow();
   });
 
-  // Mobile Touchscreen Interaction Wrapper via Polyfill Mechanics Injection
-  card.addEventListener("touchstart", (e) => {
-    if(e.target.classList.contains("card-handle")) {
-      card.classList.add("dragging");
-      activeDragElement = card;
-    }
-  }, {passive:true});
+  // Comprehensive Mobile Touch Move Polyfill System Matrix
+  const handle = card.querySelector(".card-handle");
+  
+  handle.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    activeDragElement = card;
+    touchStartCol = card.closest(".col-body");
+    card.classList.add("dragging");
+    
+    const mirror = document.getElementById("dragMirror");
+    mirror.innerHTML = card.innerHTML;
+    mirror.style.width = card.offsetWidth + "px";
+    mirror.style.display = "block";
+    mirror.style.left = touch.clientX - 20 + "px";
+    mirror.style.top = touch.clientY - 20 + "px";
+  }, { passive: true });
 
-  card.addEventListener("touchend", () => {
-    if(card.classList.contains("dragging")){
-      card.classList.remove("dragging");
-      activeDragElement = null;
-      runCalculations();
-      saveNow();
+  handle.addEventListener("touchmove", (e) => {
+    if (!activeDragElement) return;
+    const touch = e.touches[0];
+    
+    const mirror = document.getElementById("dragMirror");
+    mirror.style.left = touch.clientX - 20 + "px";
+    mirror.style.top = touch.clientY - 20 + "px";
+    
+    // Find target element underneath client touch vectors
+    const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!targetElement) return;
+    
+    const targetBody = targetElement.closest(".col-body");
+    if (targetBody) {
+      document.querySelectorAll(".col-body").forEach(b => b.classList.remove("drag-over"));
+      targetBody.classList.add("drag-over");
+      
+      const afterEl = getDragAfterElement(targetBody, touch.clientY);
+      if (afterEl == null) {
+        targetBody.appendChild(activeDragElement);
+      } else {
+        targetBody.insertBefore(activeDragElement, afterEl);
+      }
     }
+  }, { passive: true });
+
+  handle.addEventListener("touchend", () => {
+    if (!activeDragElement) return;
+    document.querySelectorAll(".col-body").forEach(b => b.classList.remove("drag-over"));
+    card.classList.remove("dragging");
+    
+    const mirror = document.getElementById("dragMirror");
+    mirror.style.display = "none";
+    
+    const targetBody = card.closest(".col-body");
+    if (targetBody) {
+      handleAutoLabPairing(card, targetBody);
+    }
+    
+    activeDragElement = null;
+    touchStartCol = null;
+    runCalculations();
+    saveNow();
   });
 
   return card;
@@ -650,7 +621,7 @@ function renderBoard(data) {
       <div class="col-header">
         <div class="col-title-row">
           <span class="col-title">${colData.title}</span>
-          <button class="col-delete">×</button>
+          <button class="col-delete" title="Double click to remove column">×</button>
         </div>
         ${colData.type === "summer" ? '<button class="summer-toggle">Collapse Summer Term</button>' : `
         <div class="gauge-wrap">
@@ -667,27 +638,35 @@ function renderBoard(data) {
     const body = col.querySelector(".col-body");
     setupDragAndDropHandlers(body);
 
-    col.querySelector(".col-delete").addEventListener("click", (e) => {
+    // Double-Click Confirmation Protection Loop Restored
+    col.querySelector(".col-delete").addEventListener("dblclick", (e) => {
       e.stopPropagation();
       col.remove(); runCalculations(); saveNow();
+    });
+    col.querySelector(".col-delete").addEventListener("click", (e) => {
+      e.stopPropagation();
+      document.getElementById("saveStatus").textContent = "Double-click '×' to confirm column delete";
+      setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
     });
 
     if(colData.type === "summer") {
       col.querySelector(".summer-toggle").addEventListener("click", (e) => {
         e.stopPropagation();
         col.classList.add("collapsed");
+        runCalculations();
         saveNow();
       });
       col.addEventListener("click", () => {
         if(col.classList.contains("collapsed")) {
           col.classList.remove("collapsed");
+          runCalculations();
           saveNow();
         }
       });
     }
 
     col.querySelector(".btn-add-course").addEventListener("click", () => {
-      body.appendChild(createCard("NEW 101 — Custom Node", 3));
+      body.appendChild(createCard("NEW 101 — Custom Element Node", 3));
       runCalculations(); saveNow();
     });
 
@@ -701,9 +680,122 @@ function renderBoard(data) {
   runCalculations();
 }
 
+// Prerequisite-Safe Load Balancing Optimizer System Engine
+function optimizeSchedule() {
+  let boardState = serializeBoard();
+  let moved = 0, iteration = 0, modified = true;
+
+  while (modified && iteration < 50) {
+    modified = false;
+    iteration++;
+
+    for (let i = 0; i < boardState.length - 1; i++) {
+      if (boardState[i].collapsed || boardState[i].type === "summer") continue;
+      let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
+      
+      if (load > 18 && boardState[i].courses.length > 0) {
+        let targetIndex = i + 1;
+        while (targetIndex < boardState.length && boardState[targetIndex].type === "summer") { targetIndex++; }
+        
+        if (targetIndex < boardState.length) {
+          const item = boardState[i].courses.pop();
+          boardState[targetIndex].courses.unshift(item);
+          moved++;
+          modified = true;
+          break;
+        }
+      }
+    }
+
+    if (!modified) {
+      for (let i = 0; i < boardState.length - 1; i++) {
+        if (boardState[i].collapsed || boardState[i].type === "summer") continue;
+        let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
+        
+        if (load < 12) {
+          let nextIdx = i + 1;
+          while (nextIdx < boardState.length && (boardState[nextIdx].courses.length === 0 || boardState[nextIdx].type === "summer")) { nextIdx++; }
+          
+          if (nextIdx < boardState.length && boardState[nextIdx].courses.length > 0) {
+            const candidate = boardState[nextIdx].courses[0];
+            const code = getCourseCode(candidate.text);
+            let safe = true;
+            
+            if (PREREQS[code]) {
+              PREREQS[code].forEach(req => {
+                let reqInFuture = false;
+                for (let k = i; k < boardState.length; k++) {
+                  if (boardState[k].courses.some(cx => getCourseCode(cx.text) === req)) {
+                    reqInFuture = true;
+                  }
+                }
+                if (reqInFuture) safe = false;
+              });
+            }
+            
+            if (safe) {
+              const item = boardState[nextIdx].courses.shift();
+              boardState[i].courses.push(item);
+              moved++;
+              modified = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (moved > 0) {
+    renderBoard(boardState);
+    saveNow();
+    document.getElementById("saveStatus").textContent = `Balanced plan: shifted ${moved} entries safely`;
+    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
+  } else {
+    document.getElementById("saveStatus").textContent = "Calculated plan already optimized under dependencies.";
+    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 2500);
+  }
+}
+
+function processAPText(text) {
+  let foundCredits = [];
+  const cleanText = text.replace(/[\r\n",]+/g, " ");
+
+  for (const [examName, policy] of Object.entries(UT_AP_POLICY)) {
+    const escapeExam = examName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(`${escapeExam}\\s*(\\d)`, "i");
+    const match = cleanText.match(regex);
+
+    if (match) {
+      const score = parseInt(match[1]);
+      if (score >= policy.minScore) {
+        foundCredits.push(...policy.claims);
+      }
+    }
+  }
+
+  if (foundCredits.length > 0) {
+    document.querySelectorAll(".card").forEach(card => {
+      const currentCode = getCourseCode(card.querySelector(".card-text").value);
+      if (foundCredits.includes(currentCode)) {
+        card.classList.add("ap-eligible");
+        if (!card.querySelector(".ap-claim-badge")) {
+          const badge = document.createElement("span");
+          badge.className = "badge ap-claim-badge";
+          badge.textContent = "AP AUDIT CLAIM EXEMPTION";
+          card.querySelector(".card-meta").appendChild(badge);
+        }
+      }
+    });
+    document.getElementById("apZoneText").innerHTML = `<strong>✓ Completed Report Audit:</strong> Verified claim exemptions for: ${foundCredits.join(", ")}.`;
+  } else {
+    alert("No matching UT AP credit configurations found in document textual stream data.");
+  }
+}
+
 function init() {
   buildLegend();
-  const saved = localStorage.getItem("pge_timeline_data_v15");
+  const saved = localStorage.getItem("pge_timeline_data_v15_1");
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -713,7 +805,6 @@ function init() {
     renderBoard(defaultData);
   }
 
-  // AP Event Management Pipeline Hookups
   const dropZone = document.getElementById("apDropZone");
   const fileInput = document.getElementById("apFileInput");
   const pasteArea = document.getElementById("apPasteArea");
@@ -739,24 +830,41 @@ function init() {
   });
 
   pasteArea.addEventListener("input", () => {
-    if(pasteArea.value.trim().length > 5) {
-      processAPText(pasteArea.value);
-    }
+    if(pasteArea.value.trim().length > 10) { processAPText(pasteArea.value); }
   });
 
   document.getElementById("optimizeBtn").addEventListener("click", optimizeSchedule);
   
+  // Custom Term Added Column Injectors Restored
+  document.getElementById("addSemesterBtn").addEventListener("click", () => {
+    const currentState = serializeBoard();
+    const count = currentState.filter(c => c.type === "semester").length;
+    currentState.push({ title: `Custom Semester ${count + 1}`, type: "semester", courses: [] });
+    renderBoard(currentState); saveNow();
+  });
+  document.getElementById("addSummerBtn").addEventListener("click", () => {
+    const currentState = serializeBoard();
+    const count = currentState.filter(c => c.type === "summer").length;
+    currentState.push({ title: `Custom Summer Term ${count + 1}`, type: "summer", collapsed: false, courses: [] });
+    renderBoard(currentState); saveNow();
+  });
+
+  // Targeted Term Term-Aware Recovery Engine Logic Fix
   document.getElementById("restoreBtn").addEventListener("click", () => {
     const currentState = serializeBoard();
-    // Re-inject core layout components missing from active board state workspace
+    
     defaultData.forEach(defaultCol => {
       let activeCol = currentState.find(c => c.title === defaultCol.title);
       if(!activeCol) {
         currentState.push(JSON.parse(JSON.stringify(defaultCol)));
       } else {
         defaultCol.courses.forEach(dc => {
-          let hasCourse = currentState.some(col => col.courses.some(cx => getCourseCode(cx.text) === getCourseCode(dc.text)));
-          if(!hasCourse) activeCol.courses.push(JSON.parse(JSON.stringify(dc)));
+          const dcCode = getCourseCode(dc.text);
+          // Only skip if the course is already sitting *in its exact proper term*
+          const inProperTerm = activeCol.courses.some(cx => getCourseCode(cx.text) === dcCode);
+          if(!inProperTerm) {
+            activeCol.courses.push(JSON.parse(JSON.stringify(dc)));
+          }
         });
       }
     });
@@ -764,29 +872,24 @@ function init() {
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    if (confirm("Reset layout workspace tracks to foundational sequence configuration definitions?")) {
-      localStorage.removeItem("pge_timeline_data_v15");
+    if (confirm("Reset current engineering workspace canvas tracking back to baseline defaults?")) {
+      localStorage.removeItem("pge_timeline_data_v15_1");
       renderBoard(defaultData);
     }
   });
 
-  // Textbook style readable text outline generator layout copier
   document.getElementById("copyBtn").addEventListener("click", () => {
     let output = "==================================================\n";
-    output += "       UT AUSTIN PGE DEGREE TIMELINE PROGRESS OUTLINE   \n";
+    output += "   UT AUSTIN PETROLEUM ENGINEERING TIMELINE PLAN    \n";
     output += "==================================================\n\n";
-    
     serializeBoard().forEach(col => {
-      output += `## ${col.title} ${col.collapsed ? '[COLLAPSED]' : ''}\n`;
-      if(col.courses.length === 0) output += "   (No coursework scheduled)\n";
-      col.courses.forEach(c => {
-        output += `   - [${c.credits} cr] ${c.text}\n`;
-      });
+      output += `## ${col.title} ${col.collapsed ? '[COLLAPSED TERM]' : ''}\n`;
+      if(col.courses.length === 0) output += "   (No courses scheduled in this block)\n";
+      col.courses.forEach(c => { output += `   - [${c.credits} cr] ${c.text}\n`; });
       output += "\n";
     });
-
     navigator.clipboard.writeText(output);
-    alert("Clear text layout summary map exported to dashboard clipboard!");
+    alert("Formatted outline profile successfully copied to dashboard clipboard!");
   });
 }
 

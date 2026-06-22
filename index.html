@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PGE Plan of Study</title>
+<title>PGE Plan of Study + AP Importer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -90,7 +90,6 @@
   .btn-outline{ border-color:var(--orange); color:var(--orange-deep); }
   .btn-outline:hover{ background:var(--orange-tint); }
   .btn-reset{ border-color:var(--charcoal); }
-  .btn-reset.confirming{ background:var(--red); border-color:var(--red); color:var(--white); }
   
   .status-msg{
     font-size:0.85rem;
@@ -106,6 +105,44 @@
     margin:0 0 1.5rem 0;
     opacity:0.8;
   }
+  
+  /* AP Score Report Importer Components Layout */
+  .ap-drop-zone {
+    background: #FAF6EE;
+    border: 2px dashed var(--orange);
+    border-radius: 8px;
+    padding: 1.2rem;
+    text-align: center;
+    max-width: 1400px;
+    margin: 0 auto 1.5rem auto;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .ap-drop-zone.drag-over {
+    background: var(--orange-tint);
+    border-color: var(--orange-deep);
+  }
+  .ap-zone-text strong { color: var(--orange-deep); }
+  
+  /* AP Dynamic Eligibility Highlights styles */
+  .card.ap-eligible {
+    border: 2px dashed var(--green) !important;
+    background: #F2FAF4 !important;
+    box-shadow: 0 0 8px rgba(63, 125, 82, 0.15);
+  }
+  .ap-claim-badge {
+    background: var(--green);
+    color: var(--white);
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+    display: inline-block;
+    letter-spacing: 0.3px;
+  }
+
   .legend{
     display:flex;
     flex-wrap:wrap;
@@ -146,7 +183,6 @@
   }
   .column-summer{ border-top-color:var(--amber); }
   
-  /* Collapsible summer style tweaks */
   .column.collapsed{
     width:50px;
     min-height:450px;
@@ -220,7 +256,7 @@
   .card-text{ font-size:0.82rem; font-weight:600; border:none; background:transparent; color:var(--charcoal); width:100%; outline:none; }
   .card-text:focus{ background:#FAF6EE; box-shadow:0 0 0 2px var(--orange-tint); border-radius:3px; }
   
-  .card-meta{ display:flex; align-items:center; gap:0.5rem; }
+  .card-meta{ display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; }
   .card-cr-wrap{ display:flex; align-items:center; font-size:0.72rem; font-weight:500; color:var(--slate); }
   .card-credits{ width:28px; border:1px solid var(--border); border-radius:4px; padding:0.1rem; text-align:center; font-family:inherit; font-size:0.72rem; font-weight:600; margin-right:0.15rem; }
   .badge{ font-size:0.62rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:4px; color:var(--white); }
@@ -234,7 +270,7 @@
 
   @media print{
     body{ background:var(--white); color:#000; padding:0; }
-    header, .instructions, .legend, .actions, footer, .add-col-controls, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle{ display:none !important; }
+    header, .instructions, .legend, .actions, footer, .add-col-controls, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle, .ap-drop-zone{ display:none !important; }
     .board{ display:grid; grid-template-columns:repeat(4, 1fr); gap:4mm; width:100%; }
     .column{ width:100% !important; page-break-inside:avoid; border:1px solid #000; box-shadow:none; }
     .column.collapsed{ display:flex !important; height:auto; background:var(--white); }
@@ -244,7 +280,6 @@
     .card{ page-break-inside:avoid; border:1px solid #CCC; box-shadow:none; grid-template-columns:1fr auto; cursor:default; }
     .card-credits{ border:none; background:transparent; }
   }
-  @media(max-width:640px){ .column{ width:80vw; } .board-outer{ scroll-snap-type:x mandatory; } .column{ scroll-snap-align:center; } }
 </style>
 </head>
 <body>
@@ -264,8 +299,14 @@
     </div>
     
     <p class="instructions">
-      Drag and drop course cards to any semester or summer column. Physics classes and their matching labs move together as locked co-requisites. Double-click on any course title or credit hours block to customize your requirements.
+      Drag and drop course cards to organize semesters. Drop an AP text report from College Board below to match UT's credit guidelines and flag removable courses.
     </p>
+
+    <div class="ap-drop-zone" id="apDropZone">
+      <div class="ap-zone-text" id="apZoneText">
+        <strong>✈ Import AP Scores:</strong> Drag and drop your plain text file (`.txt`) containing College Board score summaries here to flag and highlight test-exempt credit claims!
+      </div>
+    </div>
 
     <div class="legend" id="legend"></div>
 
@@ -304,12 +345,38 @@ const PREREQS = {
   "HIS 315L": ["HIS 315K"]
 };
 
-// Target Map for Magnetic Co-requisite automation sequences
 const CO_REQS = {
   "PHY 303K": "PHY 105M",
   "PHY 105M": "PHY 303K",
   "PHY 303L": "PHY 105N",
   "PHY 105N": "PHY 303L"
+};
+
+// COMPREHENSIVE UT AUSTIN AP SCORE EXEMPTION DICTIONARY
+const UT_AP_POLICY = {
+  "Calculus AB": { minScore: 3, claims: ["M 408C"] },
+  "Calculus BC": { minScore: 3, claims: ["M 408C", "M 408D"] }, // Note: Score of 3+ gives credit for both sequences
+  "Chemistry": { 
+    minScore: 3, 
+    evaluator: (score) => score >= 4 ? ["CH 301", "CH 302"] : ["CH 301"] // 4+ maps out foundational logic sequence completely
+  },
+  "Physics C: Mechanics": { minScore: 3, claims: ["PHY 303K", "PHY 105M"] }, // Engineering Physics 1 track variant
+  "Physics C: Electricity and Magnetism": { minScore: 3, claims: ["PHY 303L", "PHY 105N"] }, // Engineering Physics 2 track variant
+  "English Language and Composition": { minScore: 3, claims: ["RHE 306"] },
+  "English Literature and Composition": { minScore: 3, claims: ["E 316"] }, // Clears core masterworks requirement layout block
+  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] }, // Maps legislative core blocks completely
+  "American Government": { minScore: 3, claims: ["GOV 310L"] },
+  "Comparative Government and Politics": { minScore: 3, claims: ["GOV 312L"] },
+  "Microeconomics": { minScore: 3, claims: ["Social & Behavioral Sciences"] }, // Fulfills generic elective social requirement core
+  "Macroeconomics": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
+  "Psychology": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
+  "Art History": { minScore: 3, claims: ["Visual & Performing Arts"] }, // Fulfills general VAPA arts credit component
+  "Music Theory": { minScore: 3, claims: ["Visual & Performing Arts"] },
+  "Studio Art: 2-D Design": { minScore: 3, claims: ["Visual & Performing Arts"] },
+  "Studio Art: 3-D Design": { minScore: 3, claims: ["Visual & Performing Arts"] },
+  "Studio Art: Drawing": { minScore: 3, claims: ["Visual & Performing Arts"] },
+  "Human Geography": { minScore: 3, claims: ["Social & Behavioral Sciences"] },
+  "Environmental Science": { minScore: 3, claims: ["GEO 303"] } // Environmental sciences maps cleanly to foundational geology elective alternative track
 };
 
 const SUBJECT_MAP = [
@@ -340,618 +407,4 @@ const defaultData = [
     { text: "M 408D — Sequences, Series, and Multivariable", credits: 4 },
     { text: "PGE 301 — Introduction to Petroleum Engineering", credits: 3 },
     { text: "CH 302 — Principles of Chemistry II", credits: 3 },
-    { text: "Social & Behavioral Sciences", credits: 3 }
-  ]},
-  { title: "Summer · Year 1", type: "summer", collapsed: true, courses: [] },
-  { title: "Fall · Year 2", type: "semester", courses: [
-    { text: "PHY 303L — Engineering Physics II", credits: 3 },
-    { text: "PHY 105N — Laboratory For Physics II", credits: 1 },
-    { text: "E M 306 — Statics", credits: 3 },
-    { text: "M 427J — Differential Equations with Linear Algebra", credits: 4 },
-    { text: "PGE 311 — Numerical Methods and Data Visualization", credits: 3 },
-    { text: "PGE 326 — Thermodynamics & Phase Behavior", credits: 3 }
-  ]},
-  { title: "Spring · Year 2", type: "semester", courses: [
-    { text: "GEO 316P — Sedimentary Rocks", credits: 3 },
-    { text: "E M 319 — Mechanics of Solids", credits: 3 },
-    { text: "PGE 333T — Engineering Communication", credits: 3 },
-    { text: "PGE 427 — Properties of Petroleum Fluids", credits: 4 },
-    { text: "Visual & Performing Arts", credits: 3 }
-  ]},
-  { title: "Summer · Year 2", type: "summer", collapsed: true, courses: [] },
-  { title: "Fall · Year 3", type: "semester", courses: [
-    { text: "PGE 323K — Reservoir Engineering I: Primary Recovery", credits: 3 },
-    { text: "PGE 424 — Drilling and Well Completions", credits: 4 },
-    { text: "PGE 430 — Well Logging and Transport Phenomena", credits: 4 },
-    { text: "PGE 322K — Transport Phenomena in PGE", credits: 3 },
-    { text: "GOV 310L — American Government", credits: 3 }
-  ]},
-  { title: "Spring · Year 3", type: "semester", courses: [
-    { text: "PGE 323L — Reservoir Engineering II: Secondary Recovery", credits: 3 },
-    { text: "PGE 358 — Principles of Well Logging", credits: 3 },
-    { text: "PGE 362 — Production Engineering & Well Performance", credits: 3 },
-    { text: "PGE 338 — Integrated Carbon Geostorage Engineering", credits: 3 },
-    { text: "HIS 315K — United States History I", credits: 3 }
-  ]},
-  { title: "Summer · Year 3", type: "summer", collapsed: true, courses: [] },
-  { title: "Fall · Year 4", type: "semester", courses: [
-    { text: "PGE 334 — Reservoir Engineering III", credits: 3 },
-    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
-    { text: "Tech Area Elective", credits: 3 },
-    { text: "Tech Area Elective", credits: 3 },
-    { text: "GOV 312L — Issues & Policies in American Government", credits: 3 }
-  ]},
-  { title: "Spring · Year 4", type: "semester", courses: [
-    { text: "PGE 373L — Senior Capstone Design Project", credits: 3 },
-    { text: "Tech Area Elective", credits: 3 },
-    { text: "Tech Area Elective", credits: 3 },
-    { text: "E 316 — Masterworks of Literature", credits: 3 },
-    { text: "HIS 315L — United States History II", credits: 3 }
-  ]}
-];
-
-const STORAGE_KEY = "bspe_planner_v12_board";
-const board = document.getElementById("board");
-const legend = document.getElementById("legend");
-const saveStatus = document.getElementById("saveStatus");
-let saveTimer, saveFadeTimer;
-let draggedCard = null;
-
-function getCourseCode(text) {
-  if (!text) return "";
-  const match = text.trim().match(/^([A-Z. ]+\s?\d+[A-Z]*)/i);
-  return match ? match[1].trim().toUpperCase() : "";
-}
-
-function getSubjectConfig(text) {
-  const code = getCourseCode(text);
-  return SUBJECT_MAP.find(s => s.test.test(code || text)) || SUBJECT_MAP[SUBJECT_MAP.length - 1];
-}
-
-function buildLegend() {
-  legend.innerHTML = "";
-  SUBJECT_MAP.slice(0, -1).forEach(sub => {
-    const item = document.createElement("div");
-    item.className = "legend-item";
-    item.innerHTML = `<span class="legend-dot" style="background:${sub.color}"></span><span>${sub.label}</span>`;
-    legend.appendChild(item);
-  });
-}
-
-function updateGlobalStats() {
-  let totalHours = 0;
-  board.querySelectorAll(".card").forEach(card => {
-    totalHours += parseFloat(card.querySelector(".card-credits").value) || 0;
-  });
-  
-  document.getElementById("statTotalHours").textContent = totalHours;
-  
-  // Section for total hours under/over degree plan target (128 hours)
-  const varianceNode = document.getElementById("statVariance");
-  const variance = totalHours - 128;
-  if (variance > 0) {
-    varianceNode.textContent = `+${variance} Over`;
-    varianceNode.style.color = "var(--red)";
-  } else if (variance < 0) {
-    varianceNode.textContent = `${variance} Under`;
-    varianceNode.style.color = "var(--amber)";
-  } else {
-    varianceNode.textContent = "On Track";
-    varianceNode.style.color = "var(--green)";
-  }
-  
-  checkMissingCourses();
-}
-
-function checkPrereqs() {
-  const colNodes = [...board.querySelectorAll(".column")];
-  const coursePositions = new Map();
-
-  colNodes.forEach((col, idx) => {
-    col.querySelectorAll(".card").forEach(card => {
-      const code = getCourseCode(card.querySelector(".card-text").value);
-      if (code) coursePositions.set(code, idx);
-    });
-  });
-
-  colNodes.forEach((col, idx) => {
-    col.querySelectorAll(".card").forEach(card => {
-      const code = getCourseCode(card.querySelector(".card-text").value);
-      const reqs = PREREQS[code] || [];
-      let violated = false;
-
-      for (const req of reqs) {
-        if (coursePositions.has(req) && coursePositions.get(req) >= idx) {
-          violated = true;
-          break;
-        }
-      }
-
-      let warn = card.querySelector(".warn-icon");
-      if (violated) {
-        if (!warn) {
-          warn = document.createElement("div");
-          warn.className = "warn-icon";
-          warn.textContent = "!";
-          warn.title = "Prerequisite violation: scheduled before or concurrent with requirement.";
-          card.querySelector(".card-right").appendChild(warn);
-        }
-      } else if (warn) {
-        warn.remove();
-      }
-    });
-  });
-}
-
-function updateColumnGauges() {
-  board.querySelectorAll(".column").forEach(col => {
-    if (col.classList.contains("collapsed")) return;
-    
-    let sum = 0;
-    col.querySelectorAll(".card-credits").forEach(input => sum += parseFloat(input.value) || 0);
-    
-    const fill = col.querySelector(".gauge-fill");
-    if (fill) {
-      const text = col.querySelector(".gauge-hrs-text");
-      text.textContent = `${sum} hrs`;
-      
-      let mode = "track";
-      if (sum < 12) mode = "light";
-      else if (sum > 18) mode = "heavy";
-      
-      fill.className = `gauge-fill ${mode}`;
-      fill.style.width = `${Math.min(100, (sum / 22) * 100)}%`;
-      
-      const label = col.querySelector(".gauge-load-label");
-      if (label) label.textContent = sum < 12 ? "light load" : sum > 18 ? "heavy load" : "on track";
-    } else {
-      const label = col.querySelector(".summer-hrs");
-      if (label) label.textContent = `${sum} hrs`;
-    }
-  });
-}
-
-function createCard(text, credits) {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.draggable = true;
-
-  const conf = getSubjectConfig(text);
-  card.style.setProperty("--subj-color", conf.color);
-  card.style.background = conf.bg;
-
-  card.innerHTML = `
-    <div class="card-handle">⠿</div>
-    <div class="card-mid">
-      <input type="text" class="card-text" value="${text.replace(/"/g, '&quot;')}" />
-      <div class="card-meta">
-        <div class="card-cr-wrap">
-          <input type="number" class="card-credits" value="${credits}" min="0" max="10" step="0.5" /> cr
-        </div>
-        <span class="badge" style="background:${conf.color}">${conf.abbrev}</span>
-      </div>
-    </div>
-    <div class="card-right">
-      <button class="btn-del-card" title="Delete Course">×</button>
-    </div>
-  `;
-
-  // Standard HTML5 Drag API Event Handlers (No freezing)
-  card.addEventListener("dragstart", (e) => {
-    draggedCard = card;
-    card.classList.add("dragging");
-    e.dataTransfer.effectAllowed = "move";
-  });
-
-  card.addEventListener("dragend", () => {
-    card.classList.remove("dragging");
-    draggedCard = null;
-    board.querySelectorAll(".col-body").forEach(b => b.classList.remove("drag-over"));
-    runCalculations();
-    scheduleSave();
-  });
-
-  const txtInput = card.querySelector(".card-text");
-  txtInput.addEventListener("change", () => {
-    const c = getSubjectConfig(txtInput.value);
-    card.style.setProperty("--subj-color", c.color);
-    card.style.background = c.bg;
-    card.querySelector(".badge").style.background = c.color;
-    card.querySelector(".badge").textContent = c.abbrev;
-    runCalculations();
-    scheduleSave();
-  });
-  txtInput.addEventListener("keydown", (e) => { if(e.key === "Enter") txtInput.blur(); });
-
-  card.querySelector(".card-credits").addEventListener("change", () => {
-    runCalculations();
-    scheduleSave();
-  });
-
-  card.querySelector(".btn-del-card").addEventListener("click", () => {
-    card.remove();
-    runCalculations();
-    scheduleSave();
-  });
-
-  return card;
-}
-
-function createColumnHtml(title, type, collapsed = false) {
-  const col = document.createElement("div");
-  col.className = `column ${type === "summer" ? "column-summer" : ""}`;
-  if (collapsed) col.classList.add("collapsed");
-
-  col.innerHTML = `
-    <div class="collapsed-title">${title}</div>
-    <div class="col-header">
-      <div class="col-title-row">
-        <div class="col-title">${title}</div>
-        <button class="col-delete">Remove</button>
-      </div>
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; min-height:24px;">
-        ${type === 'semester' ? `
-          <div class="gauge-wrap">
-            <div class="gauge-text">
-              <span class="gauge-hrs-text">0 hrs</span>
-              <span class="gauge-load-label">on track</span>
-            </div>
-            <div class="gauge-bg"><div class="gauge-fill track"></div></div>
-          </div>
-        ` : `
-          <div class="summer-hrs">0 hrs</div>
-          <button class="summer-toggle">Collapse ⌃</button>
-        `}
-      </div>
-    </div>
-    <div class="col-body"></div>
-    <div class="col-footer">
-      <button class="btn-add-course">+ Add course</button>
-    </div>
-  `;
-
-  const body = col.querySelector(".col-body");
-
-  // Drag over target setups
-  body.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    body.classList.add("drag-over");
-    const afterElement = getDragAfterElement(body, e.clientY);
-    if (afterElement == null) {
-      body.appendChild(draggedCard);
-    } else {
-      body.insertBefore(draggedCard, afterElement);
-    }
-  });
-
-  body.addEventListener("dragleave", () => body.classList.remove("drag-over"));
-
-  body.addEventListener("drop", (e) => {
-    e.preventDefault();
-    body.classList.remove("drag-over");
-    
-    // Physics and Lab Corequisite automation snapping matching sequence
-    if (draggedCard) {
-      const code = getCourseCode(draggedCard.querySelector(".card-text").value);
-      const targetPartnerCode = CO_REQS[code];
-      if (targetPartnerCode) {
-        let partnerCard = null;
-        board.querySelectorAll(".card").forEach(c => {
-          if (getCourseCode(c.querySelector(".card-text").value) === targetPartnerCode && c !== draggedCard) {
-            partnerCard = c;
-          }
-        });
-        if (partnerCard) {
-          // Magnetically place the lab directly under the course element layout block
-          if (draggedCard.nextSibling) {
-            body.insertBefore(partnerCard, draggedCard.nextSibling);
-          } else {
-            body.appendChild(partnerCard);
-          }
-        }
-      }
-    }
-  });
-
-  if (type === "summer") {
-    col.querySelector(".summer-toggle").addEventListener("click", (e) => {
-      e.stopPropagation();
-      col.classList.add("collapsed");
-      scheduleSave();
-    });
-    col.addEventListener("click", () => {
-      if (col.classList.contains("collapsed")) {
-        col.classList.remove("collapsed");
-        scheduleSave();
-      }
-    });
-  }
-
-  let removeClicks = 0;
-  let confirmTimer;
-  const delBtn = col.querySelector(".col-delete");
-  delBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    removeClicks++;
-    if (removeClicks === 1) {
-      delBtn.textContent = "Confirm?";
-      confirmTimer = setTimeout(() => { delBtn.textContent = "Remove"; removeClicks = 0; }, 2500);
-    } else if (removeClicks === 2) {
-      clearTimeout(confirmTimer);
-      col.remove();
-      runCalculations();
-      scheduleSave();
-    }
-  });
-
-  col.querySelector(".btn-add-course").addEventListener("click", (e) => {
-    e.stopPropagation();
-    body.appendChild(createCard("NEW 101 — Custom Course Description", 3));
-    runCalculations();
-    scheduleSave();
-  });
-
-  return col;
-}
-
-function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll(".card:not(.dragging)")];
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-function renderBoard(data) {
-  board.innerHTML = "";
-  data.forEach(item => {
-    const col = createColumnHtml(item.title, item.type, item.collapsed);
-    const body = col.querySelector(".col-body");
-    item.courses.forEach(c => {
-      body.appendChild(createCard(c.text, c.credits));
-    });
-    board.appendChild(col);
-  });
-  
-  const addBlock = document.createElement("div");
-  addBlock.className = "add-col-controls";
-  addBlock.innerHTML = `
-    <button class="btn" id="addSemBtn">+ Add Semester</button>
-    <button class="btn" id="addSumBtn">+ Add Summer</button>
-  `;
-  board.appendChild(addBlock);
-
-  addBlock.querySelector("#addSemBtn").addEventListener("click", () => {
-    const count = board.querySelectorAll(".column:not(.column-summer)").length + 1;
-    board.insertBefore(createColumnHtml(`Added Semester ${count}`, "semester"), addBlock);
-    runCalculations();
-    scheduleSave();
-  });
-
-  addBlock.querySelector("#addSumBtn").addEventListener("click", () => {
-    const count = board.querySelectorAll(".column-summer").length + 1;
-    board.insertBefore(createColumnHtml(`Summer · Added ${count}`, "summer", false), addBlock);
-    runCalculations();
-    scheduleSave();
-  });
-
-  runCalculations();
-}
-
-function runCalculations() {
-  updateColumnGauges();
-  checkPrereqs();
-  updateGlobalStats();
-}
-
-function checkMissingCourses() {
-  let missing = 0;
-  const currentTitles = new Map();
-  board.querySelectorAll(".column").forEach(col => {
-    const t = col.querySelector(".col-title").textContent.trim();
-    currentTitles.set(t, [...col.querySelectorAll(".card")].map(c => c.querySelector(".card-text").value.trim()));
-  });
-
-  defaultData.forEach(defCol => {
-    const activeCourses = currentTitles.get(defCol.title.trim()) || [];
-    defCol.courses.forEach(defC => {
-      const idx = activeCourses.indexOf(defC.text.trim());
-      if (idx !== -1) {
-        activeCourses.splice(idx, 1);
-      } else {
-        missing++;
-      }
-    });
-  });
-
-  const restoreBtn = document.getElementById("restoreBtn");
-  if (missing > 0) {
-    restoreBtn.textContent = `Restore ${missing} missing course${missing > 1 ? 's' : ''}`;
-    restoreBtn.style.display = "inline-flex";
-  } else {
-    restoreBtn.style.display = "none";
-  }
-}
-
-function serializeBoard(){
-  return [...board.querySelectorAll('.column')].map(col => ({
-    title: col.querySelector('.col-title').textContent,
-    type: col.classList.contains('column-summer') ? 'summer' : 'semester',
-    collapsed: col.classList.contains('collapsed'),
-    courses: [...col.querySelectorAll('.card')].map(card => ({
-      text: card.querySelector('.card-text').value,
-      credits: parseFloat(card.querySelector('.card-credits').value) || 0,
-    })),
-  }));
-}
-
-async function saveNow(){
-  if(!hasStorage) return;
-  try{
-    saveStatus.textContent = 'Saving…';
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeBoard()));
-    saveStatus.textContent = 'Saved';
-    clearTimeout(saveFadeTimer);
-    saveFadeTimer = setTimeout(() => { saveStatus.textContent = ''; }, 2000);
-  }catch(err){
-    saveStatus.textContent = "Couldn't save session";
-  }
-}
-
-function scheduleSave(){
-  if(!hasStorage) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveNow, 700);
-}
-
-async function loadSaved(){
-  if(!hasStorage) return null;
-  try {
-    const value = localStorage.getItem(STORAGE_KEY);
-    if(value) return JSON.parse(value);
-  }catch(err){}
-  return null;
-}
-
-function optimizeSchedule() {
-  let sData = serializeBoard();
-  let semesters = sData.filter(c => c.type === "semester");
-  let moved = 0, iteration = 0, modified = true;
-
-  while (modified && iteration < 50) {
-    modified = false;
-    iteration++;
-
-    for (let i = 0; i < semesters.length - 1; i++) {
-      let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
-      if (load > 18 && semesters[i].courses.length > 0) {
-        const item = semesters[i].courses.pop();
-        semesters[i + 1].courses.unshift(item);
-        moved++;
-        modified = true;
-        break;
-      }
-    }
-
-    if (!modified) {
-      for (let i = semesters.length - 1; i > 0; i--) {
-        let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
-        if (load < 12 && semesters[i - 1].courses.length > 0) {
-          const item = semesters[i - 1].courses.pop();
-          semesters[i].courses.unshift(item);
-          moved++;
-          modified = true;
-          break;
-        }
-      }
-    }
-  }
-
-  if (moved > 0) {
-    let semIdx = 0;
-    const balancedData = sData.map(col => {
-      if (col.type === "semester") {
-        return semesters[semIdx++];
-      }
-      return col;
-    });
-    
-    renderBoard(balancedData);
-    saveNow();
-    saveStatus.textContent = `Balanced layout: arranged ${moved} courses`;
-    setTimeout(() => { saveStatus.textContent = ''; }, 3000);
-  } else {
-    saveStatus.textContent = "Schedule load is already optimized!";
-    setTimeout(() => { saveStatus.textContent = ''; }, 2500);
-  }
-}
-
-const hasStorage = typeof Storage !== 'undefined' && !!window.localStorage;
-
-(async function init(){
-  buildLegend();
-  const saved = await loadSaved();
-  if(saved) {
-    renderBoard(saved);
-  } else {
-    renderBoard(defaultData);
-  }
-
-  document.getElementById("optimizeBtn").addEventListener("click", optimizeSchedule);
-
-  document.getElementById("restoreBtn").addEventListener("click", () => {
-    const currentTitles = new Map();
-    board.querySelectorAll(".column").forEach(col => {
-      const t = col.querySelector(".col-title").textContent.trim();
-      currentTitles.set(t, [...col.querySelectorAll(".card")].map(c => c.querySelector(".card-text").value.trim()));
-    });
-
-    defaultData.forEach(defCol => {
-      const colNode = [...board.querySelectorAll(".column")].find(col => col.querySelector(".col-title").textContent.trim() === defCol.title.trim());
-      if (!colNode) return;
-      const body = colNode.querySelector(".col-body");
-      const activeCourses = currentTitles.get(defCol.title.trim()) || [];
-
-      defCol.courses.forEach(defC => {
-        const idx = activeCourses.indexOf(defC.text.trim());
-        if (idx !== -1) {
-          activeCourses.splice(idx, 1);
-        } else {
-          body.appendChild(createCard(defC.text, defC.credits));
-        }
-      });
-    });
-    runCalculations();
-    saveNow();
-  });
-
-  document.getElementById("copyBtn").addEventListener("click", () => {
-    let output = "PETROLEUM ENGINEERING PLAN OF STUDY\n====================================\n\n";
-    board.querySelectorAll(".column").forEach(col => {
-      if (col.classList.contains("collapsed")) return;
-      output += `${col.querySelector(".col-title").textContent}:\n`;
-      col.querySelectorAll(".card").forEach(card => {
-        output += `  - ${card.querySelector(".card-text").value} (${card.querySelector(".card-credits").value} cr)\n`;
-      });
-      output += "\n";
-    });
-    navigator.clipboard.writeText(output).then(() => {
-      const original = copyBtn.textContent;
-      copyBtn.textContent = "Copied ✓";
-      setTimeout(() => copyBtn.textContent = original, 1500);
-    });
-  });
-
-  document.getElementById("printBtn").addEventListener("click", () => window.print());
-
-  let resetClicks = 0;
-  let resetTimer;
-  const resetBtn = document.getElementById("resetBtn");
-  resetBtn.addEventListener("click", () => {
-    resetClicks++;
-    if (resetClicks === 1) {
-      resetBtn.classList.add("confirming");
-      resetBtn.textContent = "Click again to confirm";
-      resetTimer = setTimeout(() => {
-        resetBtn.classList.remove("confirming");
-        resetBtn.textContent = "Reset to default plan";
-        resetClicks = 0;
-      }, 2500);
-    } else if (resetClicks === 2) {
-      clearTimeout(resetTimer);
-      resetBtn.classList.remove("confirming");
-      resetBtn.textContent = "Reset to default plan";
-      resetClicks = 0;
-      localStorage.removeItem(STORAGE_KEY);
-      renderBoard(defaultData);
-    }
-  });
-})();
-</script>
-</body>
-</html>
+    { text: "Social & Behavioral Sciences",

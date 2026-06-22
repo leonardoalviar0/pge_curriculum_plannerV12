@@ -142,11 +142,14 @@
     display:flex;
     flex-direction:column;
     box-shadow:0 2px 4px rgba(38,34,32,0.04);
+    transition: width 0.2s ease, background-color 0.2s ease;
   }
   .column-summer{ border-top-color:var(--amber); }
+  
+  /* Collapsible summer style tweaks */
   .column.collapsed{
     width:50px;
-    height:450px;
+    min-height:450px;
     background:#EFEAE0;
     border-top-color:var(--border);
     cursor:pointer;
@@ -155,7 +158,6 @@
   .column.collapsed .collapsed-title{
     writing-mode:vertical-rl;
     text-orientation:mixed;
-    transform:rotate(180deg);
     font-family:'Fraunces', serif;
     font-size:0.95rem;
     font-weight:600;
@@ -165,6 +167,7 @@
     transform:translate(-50%, 0) rotate(180deg);
     white-space:nowrap;
     opacity:0.7;
+    display:block;
   }
   .column.collapsed * { display:none; }
   .column.collapsed .collapsed-title { display:block; }
@@ -301,6 +304,7 @@ const PREREQS = {
   "HIS 315L": ["HIS 315K"]
 };
 
+// Target Map for Magnetic Co-requisite automation sequences
 const CO_REQS = {
   "PHY 303K": "PHY 105M",
   "PHY 105M": "PHY 303K",
@@ -386,7 +390,7 @@ const defaultData = [
   ]}
 ];
 
-const STORAGE_KEY = "bspe_planner_v11_board";
+const STORAGE_KEY = "bspe_planner_v12_board";
 const board = document.getElementById("board");
 const legend = document.getElementById("legend");
 const saveStatus = document.getElementById("saveStatus");
@@ -436,7 +440,6 @@ function updateGlobalStats() {
     varianceNode.style.color = "var(--green)";
   }
   
-  // Check for missing items from baseline data to control restore visibility
   checkMissingCourses();
 }
 
@@ -533,7 +536,7 @@ function createCard(text, credits) {
     </div>
   `;
 
-  // Standard HTML5 Drag API Event Handlers (No coordinate calculation = Zero Freezes)
+  // Standard HTML5 Drag API Event Handlers (No freezing)
   card.addEventListener("dragstart", (e) => {
     draggedCard = card;
     card.classList.add("dragging");
@@ -627,12 +630,11 @@ function createColumnHtml(title, type, collapsed = false) {
     e.preventDefault();
     body.classList.remove("drag-over");
     
-    // Physics and Lab Corequisite automation matching sequence
+    // Physics and Lab Corequisite automation snapping matching sequence
     if (draggedCard) {
       const code = getCourseCode(draggedCard.querySelector(".card-text").value);
       const targetPartnerCode = CO_REQS[code];
       if (targetPartnerCode) {
-        // Look through the board to locate the matching pair element
         let partnerCard = null;
         board.querySelectorAll(".card").forEach(c => {
           if (getCourseCode(c.querySelector(".card-text").value) === targetPartnerCode && c !== draggedCard) {
@@ -640,7 +642,7 @@ function createColumnHtml(title, type, collapsed = false) {
           }
         });
         if (partnerCard) {
-          // Magnetically route and place the lab directly after the course element
+          // Magnetically place the lab directly under the course element layout block
           if (draggedCard.nextSibling) {
             body.insertBefore(partnerCard, draggedCard.nextSibling);
           } else {
@@ -816,7 +818,6 @@ async function loadSaved(){
   return null;
 }
 
-// Full execution logic for the Optimize Schedule system
 function optimizeSchedule() {
   let sData = serializeBoard();
   let semesters = sData.filter(c => c.type === "semester");
@@ -826,7 +827,6 @@ function optimizeSchedule() {
     modified = false;
     iteration++;
 
-    // Shift down logic for heavy overloads (> 18 credits)
     for (let i = 0; i < semesters.length - 1; i++) {
       let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
       if (load > 18 && semesters[i].courses.length > 0) {
@@ -838,7 +838,6 @@ function optimizeSchedule() {
       }
     }
 
-    // Pull forward logic for critical underloads (< 12 credits)
     if (!modified) {
       for (let i = semesters.length - 1; i > 0; i--) {
         let load = semesters[i].courses.reduce((s, c) => s + c.credits, 0);
@@ -854,7 +853,6 @@ function optimizeSchedule() {
   }
 
   if (moved > 0) {
-    // Reassemble full sequence configuration back onto DOM layers
     let semIdx = 0;
     const balancedData = sData.map(col => {
       if (col.type === "semester") {

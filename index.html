@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PGE Curriculum Planner — Production Engine v17</title>
+<title>PGE Curriculum Planner — Production Engine v18</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -148,7 +148,6 @@
     .board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; width: 100% !important; min-height: auto !important; }
     .column { width: 100% !important; margin-bottom: 1.5rem; page-break-inside: avoid; border: 1px solid #AAA !important; box-shadow: none !important; }
     
-    /* Reveal and expand collapsed columns for full transparency on print */
     .column.collapsed { width: 100% !important; min-height: auto !important; background: transparent !important; }
     .column.collapsed * { display: flex !important; }
     .column.collapsed .col-header, .column.collapsed .col-body { display: flex !important; }
@@ -174,7 +173,7 @@
     </div>
     
     <p class="instructions">
-      Interactive multi-touch layout planner mapped to standard UT Austin BSPE tracks. Drag elements from handles to rearrange terms; dependencies and co-requisite labs align automatically.
+      Interactive curriculum tracking workstation synced exactly to the official University of Texas at Austin undergraduate catalog arrangement for the Bachelor of Science in Petroleum Engineering.
     </p>
 
     <div class="global-modifiers">
@@ -213,13 +212,14 @@
   <div class="drag-mirror" id="dragMirror"></div>
 
 <script>
-// 1. OFFICIAL DATABASE AND PREREQUISITE STRUCTURES
+// 1. OFFICIAL DATABASE AND PREREQUISITE STRUCTURES (UT AUSTIN CATALOG COMPLIANT)
 const PREREQS = {
   "M 408D": ["M 408C"],
   "M 427J": ["M 408D"],
   "PHY 303L": ["PHY 303K"],
   "CH 302": ["CH 301"],
   "E M 319": ["E M 306"],
+  "PGE 311": ["M 408D"],
   "PGE 323K": ["M 427J", "PGE 311"],
   "PGE 323L": ["PGE 323K"],
   "PGE 322K": ["M 427J"],
@@ -229,7 +229,9 @@ const PREREQS = {
   "PGE 338": ["PGE 424"],
   "PGE 358": ["PGE 322K"],
   "PGE 427": ["E M 319"],
-  "PGE 430": ["E M 319"]
+  "PGE 430": ["E M 319"],
+  "PGE 473K": ["PGE 323L", "PGE 311"],
+  "PGE 273M": ["PGE 473K", "PGE 430", "PGE 358"]
 };
 
 const CO_REQS = {
@@ -259,57 +261,60 @@ const SUBJECT_MAP = [
 const defaultData = [
   { title: "Summer · Before Year 1", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 1", type: "semester", courses: [
-    { text: "GEO 303 — Intro to Geology", credits: 3 },
     { text: "CH 301 — Principles of Chemistry I", credits: 3 },
     { text: "M 408C — Differential & Integral Calculus", credits: 4 },
+    { text: "PGE 301 — Intro to Petroleum & Geosystems Eng", credits: 3 },
     { text: "RHE 306 — Rhetoric and Writing", credits: 3 },
     { text: "UGS 302 — First-Year Signature Course", credits: 3 }
   ]},
   { title: "Spring · Year 1", type: "semester", courses: [
-    { text: "PGE 311 — Numerical Methods", credits: 3 },
-    { text: "M 408D — Multivariable Calculus", credits: 4 },
     { text: "CH 302 — Principles of Chemistry II", credits: 3 },
+    { text: "GEO 303 — Intro to Geology", credits: 3 },
+    { text: "M 408D — Multivariable Calculus", credits: 4 },
     { text: "PHY 303K — Engineering Physics I", credits: 3 },
     { text: "PHY 105M — Laboratory For Physics I", credits: 1 }
   ]},
   { title: "Summer · Before Year 2", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 2", type: "semester", courses: [
-    { text: "M 427J — Differential Equations", credits: 4 },
-    { text: "PHY 303L — Engineering Physics II", credits: 3 },
-    { text: "PHY 105N — Laboratory For Physics II", credits: 1 },
     { text: "E M 306 — Statics", credits: 3 },
-    { text: "GOV 310L — American Government", credits: 3 }
+    { text: "M 427J — Differential Equations", credits: 4 },
+    { text: "PGE 311 — Numerical Methods", credits: 3 },
+    { text: "PHY 303L — Engineering Physics II", credits: 3 },
+    { text: "PHY 105N — Laboratory For Physics II", credits: 1 }
   ]},
   { title: "Spring · Year 2", type: "semester", courses: [
-    { text: "PGE 323K — Reservoir Engineering I", credits: 3 },
-    { text: "PGE 322K — Transport Phenomena", credits: 3 },
     { text: "E M 319 — Mechanics of Solids", credits: 3 },
-    { text: "HIS 315K — United States History I", credits: 3 }
+    { text: "GOV 310L — American Government", credits: 3 },
+    { text: "PGE 322K — Transport Phenomena", credits: 3 },
+    { text: "PGE 323K — Reservoir Engineering I", credits: 3 },
+    { text: "PGE 326 — Thermodynamics & Phase Behavior", credits: 3 }
   ]},
   { title: "Summer · Before Year 3", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 3", type: "semester", courses: [
-    { text: "PGE 326 — Thermodynamics & Phase Behavior", credits: 3 },
     { text: "PGE 424 — Petrophysics", credits: 4 },
+    { text: "PGE 333T — Engineering Communication", credits: 3 },
     { text: "PGE 430 — Drilling Engineering", credits: 4 },
-    { text: "HIS 315L — United States History II", credits: 3 }
+    { text: "Approved Technical Elective I", credits: 3 },
+    { text: "HIS 315K — United States History I", credits: 3 }
   ]},
   { title: "Spring · Year 3", type: "semester", courses: [
     { text: "PGE 323L — Reservoir Engineering II", credits: 3 },
+    { text: "PGE 427 — Geomechanics", credits: 4 },
     { text: "PGE 338 — Well Logging", credits: 3 },
-    { text: "PGE 333T — Engineering Communication", credits: 3 },
-    { text: "Approved Technical Elective I", credits: 3 }
+    { text: "HIS 315L — United States History II", credits: 3 },
+    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
   ]},
   { title: "Summer · Before Year 4", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 4", type: "semester", courses: [
     { text: "PGE 358 — Production Engineering", credits: 3 },
-    { text: "PGE 427 — Geomechanics", credits: 4 },
+    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
+    { text: "PGE 473K — Assessment & Simulation of Reservoirs", credits: 4 },
     { text: "Approved Technical Elective II", credits: 3 },
-    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
+    { text: "E 316L — Masterworks of Literature", credits: 3 }
   ]},
   { title: "Spring · Year 4", type: "semester", courses: [
-    { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
+    { text: "PGE 273M — PGE Design Capstone", credits: 2 },
     { text: "Approved Technical Elective III", credits: 3 },
-    { text: "E 316L — Masterworks of Literature", credits: 3 },
     { text: "GOV 312L — Issues & Policies", credits: 3 },
     { text: "Social & Behavioral Sciences", credits: 3 }
   ]}
@@ -320,7 +325,6 @@ let saveTimer = null;
 
 // 2. UNIQUE IDENTIFICATION SCANNING SYSTEM
 function getCourseId(text) {
-  // Returns alpha numeric codes if matching formatting (e.g. "PGE 326"), fallback to clean full label
   const match = text.match(/^([A-Z\s]{1,6}\d{3}[A-Z]?)/i);
   return match ? match[1].trim().replace(/\s+/g, ' ').toUpperCase() : text.trim().replace(/\s+/g, ' ').toUpperCase();
 }
@@ -343,13 +347,6 @@ function updateCardBorder(card, text) {
   card.style.borderLeftColor = matched.color;
 }
 
-function showStatus(message) {
-  const statusEl = document.getElementById("saveStatus");
-  statusEl.textContent = message;
-  statusEl.style.opacity = 1;
-  setTimeout(() => { statusEl.style.opacity = 0; }, 4000);
-}
-
 // 3. RUN EVALUATIONS ENGINE
 function runCalculations() {
   let totalHours = 0;
@@ -357,7 +354,6 @@ function runCalculations() {
   const columns = Array.from(document.querySelectorAll(".column"));
   const coursePositions = {};
   
-  // Track unique IDs across chronological terms
   columns.forEach((col, index) => {
     col.querySelectorAll(".card").forEach(card => {
       const id = getCourseId(card.querySelector(".card-text").value);
@@ -372,7 +368,6 @@ function runCalculations() {
       const text = card.querySelector(".card-text").value;
       const id = getCourseId(text);
       
-      // Enforce strict credit clamping boundaries on parsing loops
       let crField = card.querySelector(".card-credits");
       let crVal = parseFloat(crField.value) || 0;
       crVal = Math.max(0, Math.min(6, crVal));
@@ -400,7 +395,6 @@ function runCalculations() {
       }
     });
     
-    // Add load to calculation totals unconditionally (prevents collapsed summer math corruption)
     totalHours += colHours;
 
     if (!col.classList.contains("collapsed")) {
@@ -464,7 +458,7 @@ function serializeBoard() {
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    localStorage.setItem("pge_timeline_v17", JSON.stringify(serializeBoard()));
+    localStorage.setItem("pge_timeline_v18", JSON.stringify(serializeBoard()));
   }, 4000);
 }
 
@@ -477,7 +471,6 @@ function handleAutoLabPairing(movedCard, targetBody) {
       if (getCourseId(c.querySelector(".card-text").value) === companion && c !== movedCard) {
         if (c.closest(".col-body") !== targetBody) {
           targetBody.appendChild(c);
-          showStatus(`Snapped linked co-requisite card ${companion}`);
         }
       }
     });
@@ -562,7 +555,6 @@ function createCard(text, credits) {
   crInput.addEventListener("change", () => { runCalculations(); scheduleSave(); });
   card.querySelector(".btn-del-card").addEventListener("click", () => { card.remove(); runCalculations(); scheduleSave(); });
 
-  // Desktop Events
   card.addEventListener("dragstart", e => {
     activeDragElement = card;
     card.classList.add("dragging");
@@ -574,7 +566,7 @@ function createCard(text, credits) {
     runCalculations(); scheduleSave();
   });
 
-  // Mobile Touch Infrastructure
+  // Mobile Infrastructure
   const handle = card.querySelector(".card-handle");
   const mirror = document.getElementById("dragMirror");
   
@@ -657,7 +649,6 @@ function renderBoard(data) {
     const body = col.querySelector(".col-body");
     setupDragAndDropHandlers(body);
 
-    // Stateful Column Deletion Safety Trigger
     const deleteBtn = col.querySelector(".col-delete");
     let armedTimeout = null;
 
@@ -675,7 +666,6 @@ function renderBoard(data) {
         });
         deleteBtn.classList.add("armed");
         deleteBtn.textContent = "Confirm?";
-        showStatus("Click column button again to confirm immediate removal");
         
         armedTimeout = setTimeout(() => {
           deleteBtn.classList.remove("armed");
@@ -699,7 +689,7 @@ function renderBoard(data) {
     }
 
     col.querySelector(".btn-add-course").addEventListener("click", () => {
-      body.appendChild(createCard("NEW 101 — Custom Node", 3));
+      body.appendChild(createCard("NEW 101 — Custom Course Node", 3));
       runCalculations(); scheduleSave();
     });
 
@@ -710,7 +700,7 @@ function renderBoard(data) {
   runCalculations();
 }
 
-// 6. EXHAUSTIVE LOAD OPTIMIZER ENGINE
+// 6. LOAD OPTIMIZER ENGINE
 function optimizeSchedule() {
   let boardState = serializeBoard();
   let moved = 0, modified = true, iters = 0;
@@ -718,7 +708,6 @@ function optimizeSchedule() {
   while (modified && iters < 50) {
     modified = false; iters++;
     
-    // Balance overloads down the line
     for (let i = 0; i < boardState.length - 1; i++) {
       if (boardState[i].type === "summer") continue;
       let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
@@ -732,7 +721,6 @@ function optimizeSchedule() {
       }
     }
 
-    // Pull underloads forward (exhaustive index evaluation loop)
     if (!modified) {
       for (let i = 0; i < boardState.length - 1; i++) {
         if (boardState[i].type === "summer") continue;
@@ -774,9 +762,6 @@ function optimizeSchedule() {
 
   if (moved > 0) {
     renderBoard(boardState); scheduleSave();
-    showStatus(`Shifted ${moved} load balances forward safely.`);
-  } else {
-    showStatus("Timeline sequence optimized under dependency rules.");
   }
 }
 
@@ -785,7 +770,6 @@ function processAPText(text) {
   let found = [];
   const cleanText = text.replace(/[\r\n",]+/g, " ");
 
-  // Wipe previous states cleanly to prevent sticky UI anomalies
   document.querySelectorAll(".card").forEach(card => {
     card.classList.remove("ap-eligible");
     const existingBadge = card.querySelector(".ap-claim-badge");
@@ -810,15 +794,13 @@ function processAPText(text) {
       }
     });
     document.getElementById("apZoneText").innerHTML = `<strong>✓ Audit Verified:</strong> Clearances flagged for: ${found.join(", ")}.`;
-  } else {
-    showStatus("No matching configuration matches found in payload document.");
   }
 }
 
-// 8. INITIALIZATION LAYOUT INJECTORS
+// 8. INITIALIZATION
 function init() {
   buildLegend();
-  const saved = localStorage.getItem("pge_timeline_v17");
+  const saved = localStorage.getItem("pge_timeline_v18");
   try {
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -865,14 +847,13 @@ function init() {
         });
       }
     });
-    renderBoard(current); scheduleSave(); showStatus("Sequence configurations restored.");
+    renderBoard(current); scheduleSave();
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    if (confirm("Reset layout workspace tracking canvas back to UT Austin baseline metrics?")) {
-      localStorage.removeItem("pge_timeline_v17");
+    if (confirm("Reset layout workspace tracking canvas back to official UT Austin baseline catalog metrics?")) {
+      localStorage.removeItem("pge_timeline_v18");
       renderBoard(defaultData);
-      showStatus("Sequence canvas returned to base default model.");
     }
   });
 
@@ -880,12 +861,11 @@ function init() {
     let out = "## UT Austin BSPE Plan of Study Blueprint\n\n";
     serializeBoard().forEach(col => {
       out += `### ${col.title}\n`;
-      if (col.courses.length === 0) out += "- (No entries tracked in term node)\n";
+      if (col.courses.length === 0) out += "- (No entries tracked)\n";
       col.courses.forEach(c => out += `- [${c.credits} cr] ${c.text}\n`);
       out += "\n";
     });
     navigator.clipboard.writeText(out);
-    showStatus("Markdown map successfully copied to clipboard.");
   });
 }
 

@@ -3,135 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PGE Curriculum Planner — Production Engine</title>
+<title>PGE Curriculum Planner — Production Engine v17</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --cream:#F6F1E7; --charcoal:#262220; --orange:#BF5700; --orange-deep:#8C3F00;
-    --orange-tint:#FBE2C7; --slate:#5C6670; --white:#FFFFFF; --border:#E3D6BF;
-    --green:#3F7D52; --amber:#C9821B; --red:#B5402E;
+  :root {
+    --cream: #F6F1E7; --charcoal: #262220; --orange: #BF5700; --orange-deep: #8C3F00;
+    --orange-tint: #FBE2C7; --slate: #5C6670; --white: #FFFFFF; --border: #E3D6BF;
+    --green: #3F7D52; --amber: #C9821B; --red: #B5402E;
   }
-  *{box-sizing:border-box;}
-  body{margin:0; background:var(--cream); color:var(--charcoal); font-family:'Space Grotesk', sans-serif; padding:2rem; min-height:100vh;}
-  header{max-width:1400px; margin:0 auto 2rem auto;}
-  .eyebrow{font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; opacity:0.7; margin-bottom:0.5rem;}
-  .header-main{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1.5rem; margin-bottom:1rem;}
-  h1{font-family:'Fraunces', serif; font-weight:600; font-size:2.5rem; margin:0;}
-  h1 em{font-style:italic; color:var(--orange); font-weight:500;}
-  .actions{display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;}
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: var(--charcoal); font-family: 'Space Grotesk', sans-serif; padding: 2rem; min-height: 100vh; }
+  header { max-width: 1400px; margin: 0 auto 2rem auto; }
+  .eyebrow { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 0.5rem; }
+  .header-main { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 2.5rem; margin: 0; }
+  h1 em { font-style: italic; color: var(--orange); font-weight: 500; }
+  .actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
   
-  .btn{
-    font-family:inherit; font-size:0.85rem; font-weight:600; padding:0.6rem 1rem; border-radius:6px;
-    border:1.5px solid var(--border); background:var(--white); color:var(--charcoal); cursor:pointer;
-    display:inline-flex; align-items:center; gap:0.5rem; user-select:none;
+  .btn {
+    font-family: inherit; font-size: 0.85rem; font-weight: 600; padding: 0.6rem 1rem; border-radius: 6px;
+    border: 1.5px solid var(--border); background: var(--white); color: var(--charcoal); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.5rem; user-select: none; transition: 0.15s;
   }
-  .btn:hover{ background:#FAF6EE; }
-  .btn-optimize{ border-color:var(--green); color:var(--green); }
-  .btn-optimize:hover{ background:#EEF7F2; }
-  .btn-restore{ border-color:var(--amber); color:var(--amber); display:none; }
-  .btn-restore:hover{ background:#FFF9EE; }
-  .btn-outline{ border-color:var(--orange); color:var(--orange-deep); }
-  .btn-outline:hover{ background:var(--orange-tint); }
+  .btn:hover { background: #FAF6EE; }
+  .btn-optimize { border-color: var(--green); color: var(--green); }
+  .btn-optimize:hover { background: #EEF7F2; }
+  .btn-restore { border-color: var(--amber); color: var(--amber); display: none; }
+  .btn-restore:hover { background: #FFF9EE; }
+  .btn-outline { border-color: var(--orange); color: var(--orange-deep); }
+  .btn-outline:hover { background: var(--orange-tint); }
+  .btn-reset { border-color: var(--red); color: var(--red); }
+  .btn-reset:hover { background: #FDF3F2; }
   
-  .status-msg{ font-size:0.85rem; font-weight:600; color:var(--green); margin-left:0.5rem; }
-  .instructions{ max-width:900px; font-size:0.95rem; line-height:1.5; margin:0 0 1.5rem 0; opacity:0.8; }
+  .status-msg { font-size: 0.85rem; font-weight: 600; color: var(--green); margin-left: 0.5rem; transition: opacity 0.3s; opacity: 0; }
+  .instructions { max-width: 900px; font-size: 0.95rem; line-height: 1.5; margin: 0 0 1.5rem 0; opacity: 0.8; }
   
-  /* AP Multi-Input Component Suite */
-  .ap-container { max-width:1400px; margin:0 auto 1.5rem auto; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:1.2rem; }
+  /* AP Layout Suites */
+  .ap-container { max-width: 1400px; margin: 0 auto 1.5rem auto; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
   .ap-drop-zone {
     border: 2px dashed var(--orange); background: #FAF6EE; border-radius: 8px;
     padding: 1.5rem; text-align: center; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
   }
   .ap-drop-zone.drag-over { background: var(--orange-tint); border-color: var(--orange-deep); }
-  .ap-paste-area { width:100%; height:60px; margin-top:0.75rem; border:1px solid var(--border); border-radius:6px; padding:0.5rem; font-family:inherit; font-size:0.85rem; resize:none; }
+  .ap-paste-area { width: 100%; height: 60px; margin-top: 0.75rem; border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; font-family: inherit; font-size: 0.85rem; resize: none; background: #FCFAF7;}
+  .ap-paste-area:focus { outline: none; border-color: var(--orange); background: #fff; }
   
-  .legend{ display:flex; flex-wrap:wrap; gap:1rem; background:var(--white); padding:0.75rem 1.25rem; border-radius:8px; border:1px solid var(--border); margin-bottom:1.5rem; }
-  .legend-item{ display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; font-weight:600; }
-  .legend-dot{ width:10px; height:10px; border-radius:50%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 1rem; background: var(--white); padding: 0.75rem 1.25rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 600; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
   
-  .stats{ display:flex; gap:1.5rem; margin-bottom:2rem; flex-wrap:wrap; }
-  .stat-card{ background:var(--white); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1.25rem; min-width:180px; }
-  .stat-label{ font-size:0.7rem; font-weight:700; text-transform:uppercase; opacity:0.6; letter-spacing:0.5px; }
-  .stat-val{ font-size:1.6rem; font-weight:700; margin-top:0.2rem; }
+  .stats { display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; min-width: 180px; }
+  .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; letter-spacing: 0.5px; }
+  .stat-val { font-size: 1.6rem; font-weight: 700; margin-top: 0.2rem; }
   .stat-val.violation { color: var(--red); }
   .stat-val.clean { color: var(--green); }
   
-  .board-outer{ width:100%; overflow-x:auto; padding-bottom:1rem; }
-  .board{ display:flex; gap:1.2rem; align-items:flex-start; padding:0.2rem; width:max-content; }
+  .board-outer { width: 100%; overflow-x: auto; padding-bottom: 1rem; }
+  .board { display: flex; gap: 1.2rem; align-items: flex-start; padding: 0.2rem; width: max-content; min-height: 520px; }
   
-  .column{
-    width:290px; background:var(--white); border:1px solid var(--border); border-top:5px solid var(--orange);
-    border-radius:12px; display:flex; flex-direction:column; box-shadow:0 2px 4px rgba(38,34,32,0.04);
+  .column {
+    width: 290px; background: var(--white); border: 1px solid var(--border); border-top: 5px solid var(--orange);
+    border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(38,34,32,0.04);
     transition: width 0.2s, background-color 0.2s; position: relative;
   }
-  .column-summer{ border-top-color:var(--amber); }
-  .column.collapsed{ width:50px; min-height:500px; background:#EFEAE0; border-top-color:var(--border); cursor:pointer; }
-  .column.collapsed .collapsed-title{
-    writing-mode:vertical-rl; text-orientation:mixed; font-family:'Fraunces', serif; font-size:0.95rem;
-    font-weight:600; position:absolute; top:1.5rem; left:50%; transform:translate(-50%, 0) rotate(180deg); white-space:nowrap; opacity:0.7;
+  .column-summer { border-top-color: var(--amber); }
+  .column.collapsed { width: 50px; min-height: 500px; background: #EFEAE0; border-top-color: var(--border); cursor: pointer; }
+  .column.collapsed .collapsed-title {
+    writing-mode: vertical-rl; text-orientation: mixed; font-family: 'Fraunces', serif; font-size: 0.95rem;
+    font-weight: 600; position: absolute; top: 1.5rem; left: 50%; transform: translate(-50%, 0) rotate(180deg); white-space: nowrap; opacity: 0.7;
   }
-  .column.collapsed * { display:none !important; }
-  .column.collapsed .collapsed-title { display:block !important; }
-  .collapsed-title { display:none; }
+  .column.collapsed * { display: none !important; }
+  .column.collapsed .collapsed-title { display: block !important; }
+  .collapsed-title { display: none; }
 
-  .col-header{ padding:1rem; border-bottom:1px solid var(--border); background:#FAF8F5; border-radius:11px 11px 0 0; }
-  .col-title-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; }
-  .col-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.1rem; }
-  .col-delete{ background:none; border:none; color:var(--slate); font-size:1.1rem; cursor:pointer; font-weight:600; padding:0 0.2rem; }
-  .col-delete:hover{ color:var(--red); }
-  .summer-toggle{ font-size:0.72rem; color:var(--slate); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; margin-top:0.2rem;}
+  .col-header { padding: 1rem; border-bottom: 1px solid var(--border); background: #FAF8F5; border-radius: 11px 11px 0 0; }
+  .col-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; gap: 0.5rem; }
+  .col-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   
-  .gauge-wrap{ width:100%; margin-top:0.3rem; }
-  .gauge-text{ font-size:0.72rem; font-weight:600; margin-bottom:0.2rem; display:flex; justify-content:space-between; }
-  .gauge-bg{ height:6px; background:#EFEFEF; border-radius:3px; overflow:hidden; }
-  .gauge-fill{ height:100%; width:0; border-radius:3px; }
-  .gauge-fill.light{ background:var(--amber); }
-  .gauge-fill.track{ background:var(--green); }
-  .gauge-fill.heavy{ background:var(--red); }
-
-  .col-body{ padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem; min-height:300px; background:#FCFAF7; transition: background-color 0.15s; }
-  .col-body.drag-over { background:#F3EDE2; }
+  .col-delete { background: none; border: none; color: var(--slate); font-size: 1.1rem; cursor: pointer; font-weight: 600; padding: 0.2rem 0.4rem; transition: all 0.15s; border-radius: 4px; }
+  .col-delete:hover { color: var(--red); background: #FDF3F2; }
+  .col-delete.armed { font-size: 0.72rem; background: var(--red); color: var(--white); padding: 0.3rem 0.6rem; font-family: inherit; }
+  .col-delete.armed:hover { background: var(--orange-deep); }
   
-  .col-footer{ padding:0.6rem 0.75rem; border-top:1px dashed var(--border); background:#FAF8F5; border-radius:0 0 11px 11px; display:flex; gap:0.4rem; }
-  .btn-add-course{ flex:1; background:none; border:1px dashed var(--border); padding:0.4rem; font-size:0.78rem; font-weight:600; border-radius:6px; cursor:pointer; color:var(--slate); }
-  .btn-add-course:hover{ border-color:var(--orange); color:var(--orange); }
+  .summer-toggle { font-size: 0.72rem; color: var(--slate); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; margin-top: 0.2rem;}
+  
+  .gauge-wrap { width: 100%; margin-top: 0.3rem; }
+  .gauge-text { font-size: 0.72rem; font-weight: 600; margin-bottom: 0.2rem; display: flex; justify-content: space-between; }
+  .gauge-bg { height: 6px; background: #EFEFEF; border-radius: 3px; overflow: hidden; }
+  .gauge-fill { height: 100%; width: 0; border-radius: 3px; transition: width 0.3s ease, background-color 0.3s ease; }
+  .gauge-fill.light { background: var(--amber); }
+  .gauge-fill.track { background: var(--green); }
+  .gauge-fill.heavy { background: var(--red); }
 
-  .card{
-    background:var(--white); border:1px solid var(--border); border-left:5px solid #6B7280; border-radius:8px;
-    padding:0.65rem; box-shadow:0 1px 3px rgba(38,34,32,0.05); display:grid; grid-template-columns:auto 1fr auto;
-    gap:0.4rem; align-items:start; touch-action:none; position:relative; user-select:none;
+  .col-body { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; flex-grow: 1; min-height: 120px; background: #FCFAF7; transition: background-color 0.15s; }
+  .col-body.drag-over { background: #F3EDE2; }
+  
+  .col-footer { padding: 0.6rem 0.75rem; border-top: 1px dashed var(--border); background: #FAF8F5; border-radius: 0 0 11px 11px; display: flex; gap: 0.4rem; }
+  .btn-add-course { flex: 1; background: none; border: 1px dashed var(--border); padding: 0.4rem; font-size: 0.78rem; font-weight: 600; border-radius: 6px; cursor: pointer; color: var(--slate); transition: 0.15s;}
+  .btn-add-course:hover { border-color: var(--orange); color: var(--orange); background: #white;}
+
+  .card {
+    background: var(--white); border: 1px solid var(--border); border-left: 5px solid #6B7280; border-radius: 8px;
+    padding: 0.65rem; box-shadow: 0 1px 3px rgba(38,34,32,0.05); display: grid; grid-template-columns: auto 1fr auto;
+    gap: 0.4rem; align-items: start; touch-action: none; position: relative; user-select: none; transition: transform 0.1s, border-color 0.2s;
   }
-  .card.dragging { opacity:0.4; background:#FCFAF7; border-style:dashed; }
+  .card.dragging { opacity: 0.4; background: #FCFAF7; border-style: dashed; }
   .card.ap-eligible { border: 2px dashed var(--green) !important; background: #F2FAF4 !important; }
   .card.prereq-violation { border: 2px solid var(--red) !important; background: #FDF3F2 !important; }
   
-  .card-handle{ color:#A0A0A0; font-size:1.1rem; padding-right:0.1rem; cursor:grab; user-select:none; width:15px; text-align:center; }
-  .card-mid{ display:flex; flex-direction:column; gap:0.25rem; }
-  .card-text{ font-size:0.82rem; font-weight:600; border:none; background:transparent; color:var(--charcoal); width:100%; outline:none; }
-  .card-text:focus { background:#fff; box-shadow:0 0 0 1px var(--orange); border-radius:4px; }
+  .card-handle { color: #A0A0A0; font-size: 1.1rem; padding-right: 0.1rem; cursor: grab; width: 15px; text-align: center; }
+  .card-handle:active { cursor: grabbing; }
+  .card-mid { display: flex; flex-direction: column; gap: 0.25rem; }
+  .card-text { font-size: 0.82rem; font-weight: 600; border: none; background: transparent; color: var(--charcoal); width: 100%; outline: none; transition: 0.2s;}
+  .card-text:focus { background: #fff; box-shadow: 0 0 0 2px var(--orange-tint); border-radius: 4px; padding: 2px; margin: -2px;}
   
-  .card-meta{ display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
-  .card-cr-wrap{ display:flex; align-items:center; font-size:0.72rem; font-weight:500; color:var(--slate); }
-  .card-credits{ width:28px; border:1px solid var(--border); border-radius:4px; padding:0.1rem; text-align:center; font-size:0.72rem; font-weight:600; margin-right:0.15rem; background:transparent; }
-  .badge { font-size:0.62rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:4px; color:var(--white); }
-  .badge-violation { background:var(--red); }
+  .card-meta { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+  .card-cr-wrap { display: flex; align-items: center; font-size: 0.72rem; font-weight: 500; color: var(--slate); }
+  .card-credits { width: 34px; border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem; text-align: center; font-size: 0.72rem; font-weight: 600; margin-right: 0.25rem; background: transparent; outline: none; }
+  .card-credits:focus { border-color: var(--orange); }
+  .badge { font-size: 0.62rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--white); }
+  .badge-violation { background: var(--red); }
   .ap-claim-badge { background: var(--green); }
 
-  .card-right{ display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; height:100%; min-height:38px; }
-  .btn-del-card{ background:none; border:none; color:#A0A0A0; cursor:pointer; font-size:1rem; padding:0; line-height:1; }
-  .btn-del-card:hover{ color:var(--red); }
+  .card-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; height: 100%; min-height: 38px; }
+  .btn-del-card { background: none; border: none; color: #A0A0A0; cursor: pointer; font-size: 1.2rem; padding: 0; line-height: 1; transition: 0.15s;}
+  .btn-del-card:hover { color: var(--red); transform: scale(1.1); }
   
-  /* Touch Drag Overlay Visual Mirror */
   .drag-mirror {
-    position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8;
+    position: fixed; pointer-events: none; z-index: 9999; opacity: 0.9;
     background: var(--white); border: 1px solid var(--border); border-left: 5px solid var(--orange);
-    border-radius: 8px; padding: 0.65rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 260px;
-    font-family: inherit; display: none;
+    border-radius: 8px; padding: 0.65rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); width: 260px;
+    font-family: inherit; display: none; transform: rotate(-2deg);
   }
 
-  .global-modifiers { max-width:1400px; margin: 0 auto 1rem auto; display:flex; gap:0.75rem; }
+  .global-modifiers { max-width: 1400px; margin: 0 auto 1rem auto; display: flex; gap: 0.75rem; }
+
+  @media print {
+    body { background: #fff; padding: 0; color: #000; }
+    header, .actions, .ap-container, .legend, .col-footer, .btn-del-card, .card-handle, .col-delete, .summer-toggle, .global-modifiers { display: none !important; }
+    .board-outer { overflow: visible; }
+    .board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; width: 100% !important; min-height: auto !important; }
+    .column { width: 100% !important; margin-bottom: 1.5rem; page-break-inside: avoid; border: 1px solid #AAA !important; box-shadow: none !important; }
+    
+    /* Reveal and expand collapsed columns for full transparency on print */
+    .column.collapsed { width: 100% !important; min-height: auto !important; background: transparent !important; }
+    .column.collapsed * { display: flex !important; }
+    .column.collapsed .col-header, .column.collapsed .col-body { display: flex !important; }
+    .column.collapsed .collapsed-title { display: none !important; }
+    .gauge-wrap { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -142,15 +165,16 @@
       <h1>Petroleum Engineering <em>Plan of Study</em></h1>
       <div class="actions">
         <button class="btn btn-restore" id="restoreBtn">Restore Missing Courses (0)</button>
-        <button class="btn btn-optimize" id="optimizeBtn">Optimize schedule</button>
-        <button class="btn btn-outline" id="copyBtn">Copy as text</button>
-        <button class="btn btn-reset" id="resetBtn">Reset to default plan</button>
+        <button class="btn btn-optimize" id="optimizeBtn">Optimize Schedule</button>
+        <button class="btn btn-outline" id="printBtn">Print Plan</button>
+        <button class="btn btn-outline" id="copyBtn">Copy as Text</button>
+        <button class="btn btn-reset" id="resetBtn">Reset to Default Plan</button>
         <span class="status-msg" id="saveStatus"></span>
       </div>
     </div>
     
     <p class="instructions">
-      Interactive multi-touch layout planner mapped to standard UT Austin BSPE tracks. Drag elements from handles to rearrange terms; dependencies and co-requisite labs align automatically on drop.
+      Interactive multi-touch layout planner mapped to standard UT Austin BSPE tracks. Drag elements from handles to rearrange terms; dependencies and co-requisite labs align automatically.
     </p>
 
     <div class="global-modifiers">
@@ -161,11 +185,11 @@
     <div class="ap-container">
       <div class="ap-drop-zone" id="apDropZone">
         <div class="ap-zone-text" id="apZoneText">
-          <strong>✈ AP Score Center:</strong> Drag & drop your `Score Report.pdf` text layout here, or <u>click to browse</u>.
+          <strong>✈ AP Score Center:</strong> Drag & drop your `Score Report.pdf` or `.txt` here, or <u>click to browse</u>.
         </div>
         <input type="file" id="apFileInput" accept=".txt,.pdf" style="display:none;">
       </div>
-      <textarea class="ap-paste-area" id="apPasteArea" placeholder="...or paste raw copied text contents directly from College Board scorecard report here to trigger evaluation loops"></textarea>
+      <textarea class="ap-paste-area" id="apPasteArea" placeholder="...or paste raw copied text contents directly from College Board scorecard report here"></textarea>
     </div>
 
     <div class="legend" id="legend"></div>
@@ -188,12 +212,8 @@
 
   <div class="drag-mirror" id="dragMirror"></div>
 
-  <footer>
-    Prototyping engine v15.1. Cross-verify credit claim sequences with your Cockrell engineering advisor records.
-  </footer>
-
 <script>
-// 1. LOCKED CODE PARSING AND DEPENDENCY STRUCTURES
+// 1. OFFICIAL DATABASE AND PREREQUISITE STRUCTURES
 const PREREQS = {
   "M 408D": ["M 408C"],
   "M 427J": ["M 408D"],
@@ -206,9 +226,9 @@ const PREREQS = {
   "PGE 326": ["CH 302", "M 408D"],
   "PGE 424": ["PGE 322K", "PGE 323K"],
   "PGE 333T": ["RHE 306"],
-  "PGE 337": ["PGE 323K"],
+  "PGE 338": ["PGE 424"],
   "PGE 358": ["PGE 322K"],
-  "PGE 368": ["PGE 323K", "PGE 322K"],
+  "PGE 427": ["E M 319"],
   "PGE 430": ["E M 319"]
 };
 
@@ -223,7 +243,8 @@ const UT_AP_POLICY = {
   "Chemistry": { minScore: 3, claims: ["CH 301"] },
   "Computer Science A": { minScore: 3, claims: ["PGE 311"] },
   "English Language and Composition": { minScore: 3, claims: ["RHE 306"] },
-  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] }
+  "United States History": { minScore: 3, claims: ["HIS 315K", "HIS 315L"] },
+  "American Government": { minScore: 3, claims: ["GOV 310L"] }
 };
 
 const SUBJECT_MAP = [
@@ -235,7 +256,6 @@ const SUBJECT_MAP = [
   { test: /.*/, label: "Core Requirements / Electives", color: "#8A7A3D" }
 ];
 
-// 2. LOCKED OFFICIAL 128-HOUR SEQUENCE DATABASE
 const defaultData = [
   { title: "Summer · Before Year 1", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 1", type: "semester", courses: [
@@ -264,44 +284,45 @@ const defaultData = [
     { text: "PGE 323K — Reservoir Engineering I", credits: 3 },
     { text: "PGE 322K — Transport Phenomena", credits: 3 },
     { text: "E M 319 — Mechanics of Solids", credits: 3 },
-    { text: "PGE 333T — Engineering Communication", credits: 3 },
     { text: "HIS 315K — United States History I", credits: 3 }
   ]},
   { title: "Summer · Before Year 3", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 3", type: "semester", courses: [
-    { text: "PGE 323L — Reservoir Engineering II", credits: 3 },
-    { text: "PGE 326 — Petrophysics", credits: 3 },
+    { text: "PGE 326 — Thermodynamics & Phase Behavior", credits: 3 },
+    { text: "PGE 424 — Petrophysics", credits: 4 },
     { text: "PGE 430 — Drilling Engineering", credits: 4 },
     { text: "HIS 315L — United States History II", credits: 3 }
   ]},
   { title: "Spring · Year 3", type: "semester", courses: [
-    { text: "PGE 424 — Petrophysical Logging", credits: 4 },
-    { text: "PGE 337 — Intro to Geostatistics", credits: 3 },
-    { text: "Approved Technical Elective I", credits: 3 },
-    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
+    { text: "PGE 323L — Reservoir Engineering II", credits: 3 },
+    { text: "PGE 338 — Well Logging", credits: 3 },
+    { text: "PGE 333T — Engineering Communication", credits: 3 },
+    { text: "Approved Technical Elective I", credits: 3 }
   ]},
   { title: "Summer · Before Year 4", type: "summer", collapsed: true, courses: [] },
   { title: "Fall · Year 4", type: "semester", courses: [
-    { text: "PGE 358 — Principles of Production Eng", credits: 3 },
-    { text: "PGE 368 — Fundamentals of Well Logging", credits: 3 },
+    { text: "PGE 358 — Production Engineering", credits: 3 },
+    { text: "PGE 427 — Geomechanics", credits: 4 },
     { text: "Approved Technical Elective II", credits: 3 },
-    { text: "Social & Behavioral Sciences", credits: 3 }
+    { text: "Visual & Performing Arts (VAPA)", credits: 3 }
   ]},
   { title: "Spring · Year 4", type: "semester", courses: [
     { text: "PGE 365 — Resource Economics & Valuation", credits: 3 },
     { text: "Approved Technical Elective III", credits: 3 },
     { text: "E 316L — Masterworks of Literature", credits: 3 },
-    { text: "GOV 312L — Issues & Policies", credits: 3 }
+    { text: "GOV 312L — Issues & Policies", credits: 3 },
+    { text: "Social & Behavioral Sciences", credits: 3 }
   ]}
 ];
 
 let activeDragElement = null;
-let touchStartCol = null;
+let saveTimer = null;
 
-// Regex supporting two-word designators like "E M 306" or "GOV 310L"
-function getCourseCode(text) {
+// 2. UNIQUE IDENTIFICATION SCANNING SYSTEM
+function getCourseId(text) {
+  // Returns alpha numeric codes if matching formatting (e.g. "PGE 326"), fallback to clean full label
   const match = text.match(/^([A-Z\s]{1,6}\d{3}[A-Z]?)/i);
-  return match ? match[1].trim().replace(/\s+/g, ' ').toUpperCase() : "";
+  return match ? match[1].trim().replace(/\s+/g, ' ').toUpperCase() : text.trim().replace(/\s+/g, ' ').toUpperCase();
 }
 
 function buildLegend() {
@@ -317,42 +338,54 @@ function buildLegend() {
 }
 
 function updateCardBorder(card, text) {
-  const code = getCourseCode(text);
+  const code = getCourseId(text);
   const matched = SUBJECT_MAP.find(s => s.test.test(code)) || SUBJECT_MAP[SUBJECT_MAP.length - 1];
   card.style.borderLeftColor = matched.color;
 }
 
-// 3. RETURNING TRACK EVALUATION ENGINE (VALIDATION & PAIRING)
+function showStatus(message) {
+  const statusEl = document.getElementById("saveStatus");
+  statusEl.textContent = message;
+  statusEl.style.opacity = 1;
+  setTimeout(() => { statusEl.style.opacity = 0; }, 4000);
+}
+
+// 3. RUN EVALUATIONS ENGINE
 function runCalculations() {
   let totalHours = 0;
   let validationViolations = 0;
-  const board = document.getElementById("board");
-  const columns = Array.from(board.querySelectorAll(".column"));
-  
+  const columns = Array.from(document.querySelectorAll(".column"));
   const coursePositions = {};
+  
+  // Track unique IDs across chronological terms
   columns.forEach((col, index) => {
     col.querySelectorAll(".card").forEach(card => {
-      const code = getCourseCode(card.querySelector(".card-text").value);
-      if (code) coursePositions[code] = index;
+      const id = getCourseId(card.querySelector(".card-text").value);
+      if (id) coursePositions[id] = index;
     });
   });
 
   columns.forEach((col, colIndex) => {
     let colHours = 0;
-    if (col.classList.contains("collapsed")) return;
     
     col.querySelectorAll(".card").forEach(card => {
       const text = card.querySelector(".card-text").value;
-      const code = getCourseCode(text);
-      const crInput = card.querySelector(".card-credits");
-      colHours += parseFloat(crInput.value) || 0;
+      const id = getCourseId(text);
+      
+      // Enforce strict credit clamping boundaries on parsing loops
+      let crField = card.querySelector(".card-credits");
+      let crVal = parseFloat(crField.value) || 0;
+      crVal = Math.max(0, Math.min(6, crVal));
+      if (parseFloat(crField.value) !== crVal) { crField.value = crVal; }
+      
+      colHours += crVal;
       
       card.classList.remove("prereq-violation");
       const oldBadge = card.querySelector(".badge-violation");
       if (oldBadge) oldBadge.remove();
 
-      if (code && PREREQS[code]) {
-        PREREQS[code].forEach(req => {
+      if (id && PREREQS[id]) {
+        PREREQS[id].forEach(req => {
           if (coursePositions[req] === undefined || coursePositions[req] >= colIndex) {
             card.classList.add("prereq-violation");
             validationViolations++;
@@ -367,13 +400,17 @@ function runCalculations() {
       }
     });
     
+    // Add load to calculation totals unconditionally (prevents collapsed summer math corruption)
     totalHours += colHours;
-    const fill = col.querySelector(".gauge-fill");
-    if (fill) {
-      const pct = Math.min((colHours / 18) * 100, 100);
-      fill.style.width = pct + "%";
-      col.querySelector(".hrs-val").textContent = colHours;
-      fill.className = "gauge-fill " + (colHours > 18 ? "heavy" : colHours >= 12 ? "track" : "light");
+
+    if (!col.classList.contains("collapsed")) {
+      const fill = col.querySelector(".gauge-fill");
+      if (fill) {
+        const pct = Math.min((colHours / 18) * 100, 100);
+        fill.style.width = pct + "%";
+        col.querySelector(".hrs-val").textContent = colHours;
+        fill.className = "gauge-fill " + (colHours > 18 ? "heavy" : colHours >= 12 ? "track" : "light");
+      }
     }
   });
 
@@ -390,20 +427,16 @@ function runCalculations() {
   auditMissingCourses();
 }
 
-// Prerequisite-Semester Aware Restore Engine
 function auditMissingCourses() {
   const currentState = serializeBoard();
   let missingCount = 0;
 
   defaultData.forEach(defaultCol => {
-    const matchingActiveCol = currentState.find(c => c.title === defaultCol.title);
+    const activeCol = currentState.find(c => c.title === defaultCol.title);
     defaultCol.courses.forEach(dc => {
-      const targetCode = getCourseCode(dc.text);
-      // It is missing if it does not exist *in its designated term*
-      const isPresentInTerm = matchingActiveCol ? matchingActiveCol.courses.some(cx => getCourseCode(cx.text) === targetCode) : false;
-      if (!isPresentInTerm) {
-        missingCount++;
-      }
+      const targetId = getCourseId(dc.text);
+      const isPresent = activeCol && activeCol.courses.some(cx => getCourseId(cx.text) === targetId);
+      if (!isPresent) missingCount++;
     });
   });
 
@@ -416,74 +449,44 @@ function auditMissingCourses() {
   }
 }
 
-function handleAutoLabPairing(movedCard, targetColumnBody) {
-  const code = getCourseCode(movedCard.querySelector(".card-text").value);
-  if (CO_REQS[code]) {
-    const companionCode = CO_REQS[code];
+function serializeBoard() {
+  return Array.from(document.querySelectorAll(".column")).map(col => ({
+    title: col.querySelector(".col-title") ? col.querySelector(".col-title").textContent : col.querySelector(".collapsed-title").textContent,
+    type: col.classList.contains("column-summer") ? "summer" : "semester",
+    collapsed: col.classList.contains("collapsed"),
+    courses: Array.from(col.querySelectorAll(".card")).map(card => ({
+      text: card.querySelector(".card-text").value,
+      credits: parseFloat(card.querySelector(".card-credits").value) || 0
+    }))
+  }));
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem("pge_timeline_v17", JSON.stringify(serializeBoard()));
+  }, 4000);
+}
+
+// 4. MULTI-EVENT AUTO PAIRING ENGINE
+function handleAutoLabPairing(movedCard, targetBody) {
+  const id = getCourseId(movedCard.querySelector(".card-text").value);
+  if (CO_REQS[id]) {
+    const companion = CO_REQS[id];
     document.querySelectorAll(".card").forEach(c => {
-      if (getCourseCode(c.querySelector(".card-text").value) === companionCode && c !== movedCard) {
-        if (c.closest(".col-body") !== targetColumnBody) {
-          targetColumnBody.appendChild(c);
+      if (getCourseId(c.querySelector(".card-text").value) === companion && c !== movedCard) {
+        if (c.closest(".col-body") !== targetBody) {
+          targetBody.appendChild(c);
+          showStatus(`Snapped linked co-requisite card ${companion}`);
         }
       }
     });
   }
 }
 
-function serializeBoard() {
-  const data = [];
-  document.querySelectorAll(".column").forEach(col => {
-    const courses = [];
-    col.querySelectorAll(".card").forEach(card => {
-      courses.push({
-        text: card.querySelector(".card-text").value,
-        credits: parseFloat(card.querySelector(".card-credits").value) || 0
-      });
-    });
-    data.push({
-      title: col.querySelector(".col-title") ? col.querySelector(".col-title").textContent : col.querySelector(".collapsed-title").textContent,
-      type: col.classList.contains("column-summer") ? "summer" : "semester",
-      collapsed: col.classList.contains("collapsed"),
-      courses: courses
-    });
-  });
-  return data;
-}
-
-function saveNow() {
-  localStorage.setItem("pge_timeline_data_v15_1", JSON.stringify(serializeBoard()));
-}
-
-// 4. MOBILE-TOUCH & REORDER SLOT EVALUATORS
-function setupDragAndDropHandlers(bodyElement) {
-  bodyElement.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    bodyElement.classList.add("drag-over");
-    const afterElement = getDragAfterElement(bodyElement, e.clientY);
-    if (activeDragElement) {
-      if (afterElement == null) {
-        bodyElement.appendChild(activeDragElement);
-      } else {
-        bodyElement.insertBefore(activeDragElement, afterElement);
-      }
-    }
-  });
-
-  bodyElement.addEventListener("dragleave", () => bodyElement.classList.remove("drag-over"));
-  bodyElement.addEventListener("drop", (e) => {
-    e.preventDefault();
-    bodyElement.classList.remove("drag-over");
-    if (activeDragElement) {
-      handleAutoLabPairing(activeDragElement, bodyElement);
-    }
-    runCalculations();
-    saveNow();
-  });
-}
-
 function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll(".card:not(.dragging)")];
-  return draggableElements.reduce((closest, child) => {
+  const draggables = [...container.querySelectorAll(".card:not(.dragging)")];
+  return draggables.reduce((closest, child) => {
     const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height / 2;
     if (offset < 0 && offset > closest.offset) {
@@ -494,6 +497,30 @@ function getDragAfterElement(container, y) {
   }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
+function setupDragAndDropHandlers(bodyElement) {
+  bodyElement.addEventListener("dragover", e => {
+    e.preventDefault();
+    bodyElement.classList.add("drag-over");
+    if (activeDragElement) {
+      const afterEl = getDragAfterElement(bodyElement, e.clientY);
+      if (afterEl == null) bodyElement.appendChild(activeDragElement);
+      else bodyElement.insertBefore(activeDragElement, afterEl);
+    }
+  });
+
+  bodyElement.addEventListener("dragleave", () => bodyElement.classList.remove("drag-over"));
+  
+  bodyElement.addEventListener("drop", e => {
+    e.preventDefault();
+    bodyElement.classList.remove("drag-over");
+    if (activeDragElement) {
+      handleAutoLabPairing(activeDragElement, bodyElement);
+      runCalculations(); scheduleSave();
+    }
+  });
+}
+
+// 5. NODE DOM CREATION LIFECYCLES
 function createCard(text, credits) {
   const card = document.createElement("div");
   card.className = "card";
@@ -505,13 +532,13 @@ function createCard(text, credits) {
       <input type="text" class="card-text" value="${text}">
       <div class="card-meta">
         <div class="card-cr-wrap">
-          <input type="number" class="card-credits" value="${credits}" min="0" max="5" step="0.5">
+          <input type="number" class="card-credits" value="${credits}" min="0" max="6" step="0.5">
           <span>cr</span>
         </div>
       </div>
     </div>
     <div class="card-right">
-      <button class="btn-del-card">×</button>
+      <button class="btn-del-card" title="Delete Course">×</button>
     </div>
   `;
 
@@ -523,36 +550,39 @@ function createCard(text, credits) {
   txtInput.addEventListener("change", () => { 
     updateCardBorder(card, txtInput.value); 
     handleAutoLabPairing(card, card.closest(".col-body"));
-    runCalculations(); 
-    saveNow(); 
+    runCalculations(); scheduleSave(); 
   });
-  crInput.addEventListener("change", () => { runCalculations(); saveNow(); });
-  card.querySelector(".btn-del-card").addEventListener("click", () => { card.remove(); runCalculations(); saveNow(); });
 
-  // Native Desktop Drag Event Routing
-  card.addEventListener("dragstart", (e) => {
-    activeDragElement = card;
-    card.classList.add("dragging");
-    e.dataTransfer.setData("text/plain", txtInput.value);
+  crInput.addEventListener("input", () => {
+    let val = parseFloat(crInput.value) || 0;
+    if (val > 6) crInput.value = 6;
+    if (val < 0) crInput.value = 0;
   });
   
+  crInput.addEventListener("change", () => { runCalculations(); scheduleSave(); });
+  card.querySelector(".btn-del-card").addEventListener("click", () => { card.remove(); runCalculations(); scheduleSave(); });
+
+  // Desktop Events
+  card.addEventListener("dragstart", e => {
+    activeDragElement = card;
+    card.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+  });
   card.addEventListener("dragend", () => {
     card.classList.remove("dragging");
     activeDragElement = null;
-    runCalculations();
-    saveNow();
+    runCalculations(); scheduleSave();
   });
 
-  // Comprehensive Mobile Touch Move Polyfill System Matrix
+  // Mobile Touch Infrastructure
   const handle = card.querySelector(".card-handle");
+  const mirror = document.getElementById("dragMirror");
   
-  handle.addEventListener("touchstart", (e) => {
+  handle.addEventListener("touchstart", e => {
     const touch = e.touches[0];
     activeDragElement = card;
-    touchStartCol = card.closest(".col-body");
     card.classList.add("dragging");
     
-    const mirror = document.getElementById("dragMirror");
     mirror.innerHTML = card.innerHTML;
     mirror.style.width = card.offsetWidth + "px";
     mirror.style.display = "block";
@@ -560,15 +590,13 @@ function createCard(text, credits) {
     mirror.style.top = touch.clientY - 20 + "px";
   }, { passive: true });
 
-  handle.addEventListener("touchmove", (e) => {
+  handle.addEventListener("touchmove", e => {
     if (!activeDragElement) return;
     const touch = e.touches[0];
     
-    const mirror = document.getElementById("dragMirror");
     mirror.style.left = touch.clientX - 20 + "px";
     mirror.style.top = touch.clientY - 20 + "px";
     
-    // Find target element underneath client touch vectors
     const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
     if (!targetElement) return;
     
@@ -578,11 +606,8 @@ function createCard(text, credits) {
       targetBody.classList.add("drag-over");
       
       const afterEl = getDragAfterElement(targetBody, touch.clientY);
-      if (afterEl == null) {
-        targetBody.appendChild(activeDragElement);
-      } else {
-        targetBody.insertBefore(activeDragElement, afterEl);
-      }
+      if (afterEl == null) targetBody.appendChild(activeDragElement);
+      else targetBody.insertBefore(activeDragElement, afterEl);
     }
   }, { passive: true });
 
@@ -590,19 +615,13 @@ function createCard(text, credits) {
     if (!activeDragElement) return;
     document.querySelectorAll(".col-body").forEach(b => b.classList.remove("drag-over"));
     card.classList.remove("dragging");
-    
-    const mirror = document.getElementById("dragMirror");
     mirror.style.display = "none";
     
     const targetBody = card.closest(".col-body");
-    if (targetBody) {
-      handleAutoLabPairing(card, targetBody);
-    }
+    if (targetBody) handleAutoLabPairing(card, targetBody);
     
     activeDragElement = null;
-    touchStartCol = null;
-    runCalculations();
-    saveNow();
+    runCalculations(); scheduleSave();
   });
 
   return card;
@@ -614,16 +633,16 @@ function renderBoard(data) {
 
   data.forEach(colData => {
     const col = document.createElement("div");
-    col.className = "column" + (colData.type === "summer" ? "column-summer " : " ") + (colData.collapsed ? "collapsed" : "");
+    col.className = "column" + (colData.type === "summer" ? " column-summer " : " ") + (colData.collapsed ? "collapsed" : "");
     
     col.innerHTML = `
       <span class="collapsed-title">${colData.title}</span>
       <div class="col-header">
         <div class="col-title-row">
           <span class="col-title">${colData.title}</span>
-          <button class="col-delete" title="Double click to remove column">×</button>
+          <button class="col-delete">×</button>
         </div>
-        ${colData.type === "summer" ? '<button class="summer-toggle">Collapse Summer Term</button>' : `
+        ${colData.type === "summer" ? '<button class="summer-toggle">Collapse Term</button>' : `
         <div class="gauge-wrap">
           <div class="gauge-text"><span>Term Balance</span><span><span class="hrs-val">0</span>/18 cr</span></div>
           <div class="gauge-bg"><div class="gauge-fill"></div></div>
@@ -631,114 +650,121 @@ function renderBoard(data) {
       </div>
       <div class="col-body"></div>
       <div class="col-footer">
-        <button class="btn-add-course">+ Add Term Row</button>
+        <button class="btn-add-course">+ Add Row</button>
       </div>
     `;
 
     const body = col.querySelector(".col-body");
     setupDragAndDropHandlers(body);
 
-    // Double-Click Confirmation Protection Loop Restored
-    col.querySelector(".col-delete").addEventListener("dblclick", (e) => {
+    // Stateful Column Deletion Safety Trigger
+    const deleteBtn = col.querySelector(".col-delete");
+    let armedTimeout = null;
+
+    deleteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      col.remove(); runCalculations(); saveNow();
-    });
-    col.querySelector(".col-delete").addEventListener("click", (e) => {
-      e.stopPropagation();
-      document.getElementById("saveStatus").textContent = "Double-click '×' to confirm column delete";
-      setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
+      if (deleteBtn.classList.contains("armed")) {
+        clearTimeout(armedTimeout);
+        col.remove(); 
+        runCalculations(); 
+        scheduleSave();
+      } else {
+        document.querySelectorAll(".col-delete.armed").forEach(b => {
+          b.classList.remove("armed");
+          b.textContent = "×";
+        });
+        deleteBtn.classList.add("armed");
+        deleteBtn.textContent = "Confirm?";
+        showStatus("Click column button again to confirm immediate removal");
+        
+        armedTimeout = setTimeout(() => {
+          deleteBtn.classList.remove("armed");
+          deleteBtn.textContent = "×";
+        }, 3000);
+      }
     });
 
     if(colData.type === "summer") {
-      col.querySelector(".summer-toggle").addEventListener("click", (e) => {
-        e.stopPropagation();
-        col.classList.add("collapsed");
-        runCalculations();
-        saveNow();
+      col.querySelector(".summer-toggle").addEventListener("click", e => { 
+        e.stopPropagation(); 
+        col.classList.add("collapsed"); 
+        runCalculations(); scheduleSave(); 
       });
-      col.addEventListener("click", () => {
-        if(col.classList.contains("collapsed")) {
-          col.classList.remove("collapsed");
-          runCalculations();
-          saveNow();
-        }
+      col.addEventListener("click", () => { 
+        if(col.classList.contains("collapsed")) { 
+          col.classList.remove("collapsed"); 
+          runCalculations(); scheduleSave(); 
+        } 
       });
     }
 
     col.querySelector(".btn-add-course").addEventListener("click", () => {
-      body.appendChild(createCard("NEW 101 — Custom Element Node", 3));
-      runCalculations(); saveNow();
+      body.appendChild(createCard("NEW 101 — Custom Node", 3));
+      runCalculations(); scheduleSave();
     });
 
-    colData.courses.forEach(c => {
-      body.appendChild(createCard(c.text, c.credits));
-    });
-
+    colData.courses.forEach(c => body.appendChild(createCard(c.text, c.credits)));
     board.appendChild(col);
   });
 
   runCalculations();
 }
 
-// Prerequisite-Safe Load Balancing Optimizer System Engine
+// 6. EXHAUSTIVE LOAD OPTIMIZER ENGINE
 function optimizeSchedule() {
   let boardState = serializeBoard();
-  let moved = 0, iteration = 0, modified = true;
+  let moved = 0, modified = true, iters = 0;
 
-  while (modified && iteration < 50) {
-    modified = false;
-    iteration++;
-
+  while (modified && iters < 50) {
+    modified = false; iters++;
+    
+    // Balance overloads down the line
     for (let i = 0; i < boardState.length - 1; i++) {
-      if (boardState[i].collapsed || boardState[i].type === "summer") continue;
+      if (boardState[i].type === "summer") continue;
       let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
-      
       if (load > 18 && boardState[i].courses.length > 0) {
-        let targetIndex = i + 1;
-        while (targetIndex < boardState.length && boardState[targetIndex].type === "summer") { targetIndex++; }
-        
-        if (targetIndex < boardState.length) {
-          const item = boardState[i].courses.pop();
-          boardState[targetIndex].courses.unshift(item);
-          moved++;
-          modified = true;
-          break;
+        let t = i + 1;
+        while (t < boardState.length && boardState[t].type === "summer") t++;
+        if (t < boardState.length) {
+          boardState[t].courses.unshift(boardState[i].courses.pop());
+          moved++; modified = true; break;
         }
       }
     }
 
+    // Pull underloads forward (exhaustive index evaluation loop)
     if (!modified) {
       for (let i = 0; i < boardState.length - 1; i++) {
-        if (boardState[i].collapsed || boardState[i].type === "summer") continue;
+        if (boardState[i].type === "summer") continue;
         let load = boardState[i].courses.reduce((s, c) => s + c.credits, 0);
-        
         if (load < 12) {
-          let nextIdx = i + 1;
-          while (nextIdx < boardState.length && (boardState[nextIdx].courses.length === 0 || boardState[nextIdx].type === "summer")) { nextIdx++; }
-          
-          if (nextIdx < boardState.length && boardState[nextIdx].courses.length > 0) {
-            const candidate = boardState[nextIdx].courses[0];
-            const code = getCourseCode(candidate.text);
-            let safe = true;
+          let t = i + 1;
+          while (t < boardState.length && (boardState[t].type === "summer" || boardState[t].courses.length === 0)) t++;
+          if (t < boardState.length && boardState[t].courses.length > 0) {
             
-            if (PREREQS[code]) {
-              PREREQS[code].forEach(req => {
-                let reqInFuture = false;
-                for (let k = i; k < boardState.length; k++) {
-                  if (boardState[k].courses.some(cx => getCourseCode(cx.text) === req)) {
-                    reqInFuture = true;
+            let safeCandidateIndex = -1;
+            for(let cIdx = 0; cIdx < boardState[t].courses.length; cIdx++) {
+              const candidate = boardState[t].courses[cIdx];
+              const id = getCourseId(candidate.text);
+              let safe = true;
+              
+              if (PREREQS[id]) {
+                PREREQS[id].forEach(req => {
+                  for (let k = i; k < boardState.length; k++) {
+                    if (boardState[k].courses.some(cx => getCourseId(cx.text) === req)) safe = false;
                   }
-                }
-                if (reqInFuture) safe = false;
-              });
+                });
+              }
+              if (safe) {
+                safeCandidateIndex = cIdx;
+                break;
+              }
             }
-            
-            if (safe) {
-              const item = boardState[nextIdx].courses.shift();
-              boardState[i].courses.push(item);
-              moved++;
-              modified = true;
-              break;
+
+            if (safeCandidateIndex !== -1) {
+              const safeItem = boardState[t].courses.splice(safeCandidateIndex, 1)[0];
+              boardState[i].courses.push(safeItem);
+              moved++; modified = true; break;
             }
           }
         }
@@ -747,149 +773,119 @@ function optimizeSchedule() {
   }
 
   if (moved > 0) {
-    renderBoard(boardState);
-    saveNow();
-    document.getElementById("saveStatus").textContent = `Balanced plan: shifted ${moved} entries safely`;
-    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 3000);
+    renderBoard(boardState); scheduleSave();
+    showStatus(`Shifted ${moved} load balances forward safely.`);
   } else {
-    document.getElementById("saveStatus").textContent = "Calculated plan already optimized under dependencies.";
-    setTimeout(() => { document.getElementById("saveStatus").textContent = ''; }, 2500);
+    showStatus("Timeline sequence optimized under dependency rules.");
   }
 }
 
+// 7. AP SCORE REPORT FLUSH ROUTINES
 function processAPText(text) {
-  let foundCredits = [];
+  let found = [];
   const cleanText = text.replace(/[\r\n",]+/g, " ");
 
-  for (const [examName, policy] of Object.entries(UT_AP_POLICY)) {
-    const escapeExam = examName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const regex = new RegExp(`${escapeExam}\\s*(\\d)`, "i");
-    const match = cleanText.match(regex);
+  // Wipe previous states cleanly to prevent sticky UI anomalies
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.remove("ap-eligible");
+    const existingBadge = card.querySelector(".ap-claim-badge");
+    if (existingBadge) existingBadge.remove();
+  });
 
-    if (match) {
-      const score = parseInt(match[1]);
-      if (score >= policy.minScore) {
-        foundCredits.push(...policy.claims);
-      }
-    }
+  for (const [examName, policy] of Object.entries(UT_AP_POLICY)) {
+    const regex = new RegExp(`${examName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\s*(\\d)`, "i");
+    const match = cleanText.match(regex);
+    if (match && parseInt(match[1]) >= policy.minScore) found.push(...policy.claims);
   }
 
-  if (foundCredits.length > 0) {
+  if (found.length > 0) {
     document.querySelectorAll(".card").forEach(card => {
-      const currentCode = getCourseCode(card.querySelector(".card-text").value);
-      if (foundCredits.includes(currentCode)) {
+      const id = getCourseId(card.querySelector(".card-text").value);
+      if (found.includes(id)) {
         card.classList.add("ap-eligible");
         if (!card.querySelector(".ap-claim-badge")) {
-          const badge = document.createElement("span");
-          badge.className = "badge ap-claim-badge";
-          badge.textContent = "AP AUDIT CLAIM EXEMPTION";
-          card.querySelector(".card-meta").appendChild(badge);
+          const b = document.createElement("span"); b.className = "badge ap-claim-badge"; b.textContent = "AP CLAIM";
+          card.querySelector(".card-meta").appendChild(b);
         }
       }
     });
-    document.getElementById("apZoneText").innerHTML = `<strong>✓ Completed Report Audit:</strong> Verified claim exemptions for: ${foundCredits.join(", ")}.`;
+    document.getElementById("apZoneText").innerHTML = `<strong>✓ Audit Verified:</strong> Clearances flagged for: ${found.join(", ")}.`;
   } else {
-    alert("No matching UT AP credit configurations found in document textual stream data.");
+    showStatus("No matching configuration matches found in payload document.");
   }
 }
 
+// 8. INITIALIZATION LAYOUT INJECTORS
 function init() {
   buildLegend();
-  const saved = localStorage.getItem("pge_timeline_data_v15_1");
-  if (saved) {
-    try {
+  const saved = localStorage.getItem("pge_timeline_v17");
+  try {
+    if (saved) {
       const parsed = JSON.parse(saved);
       renderBoard(parsed.length ? parsed : defaultData);
-    } catch(e) { renderBoard(defaultData); }
-  } else {
-    renderBoard(defaultData);
-  }
+    } else { renderBoard(defaultData); }
+  } catch(e) { renderBoard(defaultData); }
 
-  const dropZone = document.getElementById("apDropZone");
-  const fileInput = document.getElementById("apFileInput");
-  const pasteArea = document.getElementById("apPasteArea");
-
-  dropZone.addEventListener("click", () => fileInput.click());
-  fileInput.addEventListener("change", () => {
-    if(fileInput.files[0]) {
-      const r = new FileReader();
-      r.onload = (e) => processAPText(e.target.result);
-      r.readAsText(fileInput.files[0]);
-    }
+  const dz = document.getElementById("apDropZone"), fi = document.getElementById("apFileInput"), ta = document.getElementById("apPasteArea");
+  dz.addEventListener("click", () => fi.click());
+  fi.addEventListener("change", () => { if(fi.files[0]) { const r = new FileReader(); r.onload = e => processAPText(e.target.result); r.readAsText(fi.files[0]); }});
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("drag-over"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag-over"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("drag-over");
+    if(e.dataTransfer.files[0]) { const r = new FileReader(); r.onload = ex => processAPText(ex.target.result); r.readAsText(e.dataTransfer.files[0]); }
   });
-
-  dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("drag-over"); });
-  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault(); dropZone.classList.remove("drag-over");
-    if(e.dataTransfer.files[0]) {
-      const r = new FileReader();
-      r.onload = (ex) => processAPText(ex.target.result);
-      r.readAsText(e.dataTransfer.files[0]);
-    }
-  });
-
-  pasteArea.addEventListener("input", () => {
-    if(pasteArea.value.trim().length > 10) { processAPText(pasteArea.value); }
-  });
+  ta.addEventListener("input", () => { if(ta.value.trim().length > 10) processAPText(ta.value); });
 
   document.getElementById("optimizeBtn").addEventListener("click", optimizeSchedule);
+  document.getElementById("printBtn").addEventListener("click", () => window.print());
   
-  // Custom Term Added Column Injectors Restored
   document.getElementById("addSemesterBtn").addEventListener("click", () => {
-    const currentState = serializeBoard();
-    const count = currentState.filter(c => c.type === "semester").length;
-    currentState.push({ title: `Custom Semester ${count + 1}`, type: "semester", courses: [] });
-    renderBoard(currentState); saveNow();
+    const s = serializeBoard();
+    s.push({ title: `Custom Semester ${s.filter(c => c.type==="semester").length + 1}`, type: "semester", courses: [] });
+    renderBoard(s); scheduleSave();
   });
+  
   document.getElementById("addSummerBtn").addEventListener("click", () => {
-    const currentState = serializeBoard();
-    const count = currentState.filter(c => c.type === "summer").length;
-    currentState.push({ title: `Custom Summer Term ${count + 1}`, type: "summer", collapsed: false, courses: [] });
-    renderBoard(currentState); saveNow();
+    const s = serializeBoard();
+    s.push({ title: `Summer Term ${s.filter(c => c.type==="summer").length + 1}`, type: "summer", collapsed: false, courses: [] });
+    renderBoard(s); scheduleSave();
   });
 
-  // Targeted Term Term-Aware Recovery Engine Logic Fix
   document.getElementById("restoreBtn").addEventListener("click", () => {
-    const currentState = serializeBoard();
-    
-    defaultData.forEach(defaultCol => {
-      let activeCol = currentState.find(c => c.title === defaultCol.title);
-      if(!activeCol) {
-        currentState.push(JSON.parse(JSON.stringify(defaultCol)));
-      } else {
-        defaultCol.courses.forEach(dc => {
-          const dcCode = getCourseCode(dc.text);
-          // Only skip if the course is already sitting *in its exact proper term*
-          const inProperTerm = activeCol.courses.some(cx => getCourseCode(cx.text) === dcCode);
-          if(!inProperTerm) {
-            activeCol.courses.push(JSON.parse(JSON.stringify(dc)));
+    const current = serializeBoard();
+    defaultData.forEach(dc => {
+      let active = current.find(c => c.title === dc.title);
+      if (!active) { current.push(JSON.parse(JSON.stringify(dc))); }
+      else {
+        dc.courses.forEach(course => {
+          if (!active.courses.some(cx => getCourseId(cx.text) === getCourseId(course.text))) {
+            active.courses.push(JSON.parse(JSON.stringify(course)));
           }
         });
       }
     });
-    renderBoard(currentState); saveNow();
+    renderBoard(current); scheduleSave(); showStatus("Sequence configurations restored.");
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    if (confirm("Reset current engineering workspace canvas tracking back to baseline defaults?")) {
-      localStorage.removeItem("pge_timeline_data_v15_1");
+    if (confirm("Reset layout workspace tracking canvas back to UT Austin baseline metrics?")) {
+      localStorage.removeItem("pge_timeline_v17");
       renderBoard(defaultData);
+      showStatus("Sequence canvas returned to base default model.");
     }
   });
 
   document.getElementById("copyBtn").addEventListener("click", () => {
-    let output = "==================================================\n";
-    output += "   UT AUSTIN PETROLEUM ENGINEERING TIMELINE PLAN    \n";
-    output += "==================================================\n\n";
+    let out = "## UT Austin BSPE Plan of Study Blueprint\n\n";
     serializeBoard().forEach(col => {
-      output += `## ${col.title} ${col.collapsed ? '[COLLAPSED TERM]' : ''}\n`;
-      if(col.courses.length === 0) output += "   (No courses scheduled in this block)\n";
-      col.courses.forEach(c => { output += `   - [${c.credits} cr] ${c.text}\n`; });
-      output += "\n";
+      out += `### ${col.title}\n`;
+      if (col.courses.length === 0) out += "- (No entries tracked in term node)\n";
+      col.courses.forEach(c => out += `- [${c.credits} cr] ${c.text}\n`);
+      out += "\n";
     });
-    navigator.clipboard.writeText(output);
-    alert("Formatted outline profile successfully copied to dashboard clipboard!");
+    navigator.clipboard.writeText(out);
+    showStatus("Markdown map successfully copied to clipboard.");
   });
 }
 
